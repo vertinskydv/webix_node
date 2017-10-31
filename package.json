@@ -4,18 +4,31 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "webpack --env.production true",
     "start": "nodemon app.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "webix-jet": "^1.0.3"
   },
   "devDependencies": {
     "eslint": "^4.10.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-xbsoftware": "git+https://bitbucket.org/xbsltd/eslint.git",
     "mysql": "^2.15.0",
-    "nodemon": "^1.12.1"
+    "nodemon": "^1.12.1",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "css-loader": "^0.28.7",
+    "extract-text-webpack-plugin": "^3.0.0",
+    "file-loader": "^0.11.2",
+    "less": "^2.7.2",
+    "less-loader": "^4.0.5",
+    "url-loader": "^0.5.9",
+    "webpack": "^3.6.0",
+    "webpack-dev-server": "^2.8.2"
   }
 }
