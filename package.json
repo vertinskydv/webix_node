@@ -1,0 +1,21 @@
+{
+  "name": "webix-sand",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2"
+  },
+  "devDependencies": {
+    "eslint": "^4.10.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-xbsoftware": "git+https://bitbucket.org/xbsltd/eslint.git",
+    "mysql": "^2.15.0",
+    "nodemon": "^1.12.1"
+  }
+}
