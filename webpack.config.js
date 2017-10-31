@@ -1,8 +1,7 @@
-var path = require("path");
-var webpack = require("webpack");
+var path = require('path');
+var webpack = require('webpack');
 
-module.exports = function(env) {
-
+module.exports = function (env) {
 	var pack = require("./package.json");
 	var ExtractTextPlugin = require("extract-text-webpack-plugin");
 	var production = !!(env && env.production === "true");

@@ -1,41 +1,7 @@
 webix.ready(function () {
-    let leftMenuUiData = [
-        {
-            id: 'locations',
-            icon: 'home',
-            value: 'Locations'
-        },
-        {
-            id: 'staff',
-            icon: 'users',
-            value: 'Staff'
-        },
-        {
-            id: 'equipment',
-            icon: 'headphones',
-            value: 'Equipment'
-        },
-        {
-            id: 'calendar',
-            icon: 'calendar',
-            value: 'Calendar',
-            data: [
-                {
-                    id: 'rental_schedule',
-                    icon: 'clock-o',
-                    value: 'Rental schedule'
-                },
-                {
-                    id: 'staff_work_schedule',
-                    icon: 'address-card-o',
-                    value: 'Staff work schedule'
-                }
-            ]
-        }
-    ];
+
     let locationsUiData = {
         view: 'datatable',
-
     };
 
     webix.ui({
@@ -59,7 +25,7 @@ webix.ready(function () {
                         data: leftMenuUiData
                     },
                     {
-                        view: 'datatable',
+                        view: 'datatable'
 
                     }
                 ]
