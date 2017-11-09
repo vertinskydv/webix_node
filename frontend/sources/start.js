@@ -3,7 +3,7 @@ import {JetApp} from 'webix-jet';
 
 webix.ready(() => {
     let app = new JetApp({
-        start: '/nav/start'
+        start: '/app/locations'
     });
     app.render();
 

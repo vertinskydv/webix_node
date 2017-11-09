@@ -10,7 +10,7 @@ module.exports = function (env) {
     };
     
     var config = {
-        entry: "./frontend/sources/app.js",
+        entry: "./frontend/sources/start.js",
         output: {
             path: path.join(__dirname, "frontend/codebase"),
             publicPath: "frontend/codebase/",
