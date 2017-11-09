@@ -4,40 +4,47 @@ import {data} from "../models/records";
 export default class Locations extends JetView {
     config() {
         return {
-            view: 'datatable',
-            id: 'locationsDt',
-            editable: true,
-            editaction: 'dblclick',
-            select: 'row',
-            columns: [
+            rows: [
                 {
-                    id: 'name',
-                    header: ['Studio Name', {content: 'textFilter'}],
-                    sort: 'string',
-                    fillspace: true,
+                    margin: 20, view: 'button', value: 'Add New Studio',  type:"icon", icon:"mail", inputWidth: 200, align: 'right'
                 },
                 {
-                    id: 'address',
-                    header: ['Address', {content: 'textFilter'}],
-                    sort: 'string',
-                    fillspace: true,
-                },
-                {
-                    id: 'staff_count',
-                    header: ['Staff Count', {content: 'textFilter'}],
-                    sort: 'int',
-                    width: 200,
+                    view: 'datatable',
+                    id: 'locationsDt',
+                    editable: true,
+                    editaction: 'dblclick',
+                    select: 'row',
+                    columns: [
+                        {
+                            id: 'name',
+                            header: ['Studio Name', {content: 'textFilter'}],
+                            sort: 'string',
+                            fillspace: true,
+                        },
+                        {
+                            id: 'address',
+                            header: ['Address', {content: 'textFilter'}],
+                            sort: 'string',
+                            fillspace: true,
+                        },
+                        {
+                            id: 'staff_count',
+                            header: ['Staff Count', {content: 'textFilter'}],
+                            sort: 'int',
+                            width: 200,
+                        }
+                    ],
+                    on: {
+                        onBeforeLoad: function () {
+                            this.showOverlay('Loading...');
+                        },
+                        onAfterLoad: function () {
+                            this.hideOverlay();
+                        },
+                        onItemDblClick: editRow
+                    }
                 }
-            ],
-            on: {
-                onBeforeLoad: function () {
-                    this.showOverlay('Loading...');
-                },
-                onAfterLoad: function () {
-                    this.hideOverlay();
-                },
-                onItemDblClick: editRow
-            },
+            ]
         };
     }
 
@@ -66,21 +73,23 @@ webix.ui({
             {view: 'text', label: 'Studio Name', name: 'name', labelWidth: 150},
             {view: 'text', label: 'Address', name: 'address', labelWidth: 150},
             {view: 'text', attributes: {type: 'number'}, label: 'Staff Count', name: 'staff_count', labelWidth: 150},
-            {margin: 20, cols: [
-                {
-                    view: 'button',
-                    value: 'Cancel',
-                    click: "$$('studioPropsModal').hide()"
-                },
-                {view: 'button', value: 'Save'}
-            ]}
+            {
+                margin: 20, cols: [
+                    {
+                        view: 'button',
+                        value: 'Cancel',
+                        click: "$$('studioPropsModal').hide()"
+                    },
+                    {view: 'button', value: 'Save'}
+                ]
+            }
         ]
     }
 });
 
-function editRow (data, some) {
+function editRow(data, some) {
     data = $$('locationsDt').getItem(data.row);
-
+    
     $$('studioPropsModal').show();
     $$('studioPropsForm').parse(data);
 }
