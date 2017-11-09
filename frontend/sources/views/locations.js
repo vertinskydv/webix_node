@@ -6,7 +6,18 @@ export default class Locations extends JetView {
         return {
             rows: [
                 {
-                    margin: 20, view: 'button', value: 'Add New Studio',  type:"icon", icon:"mail", inputWidth: 200, align: 'right'
+                    cols: [
+                        {},
+                        {
+                            margin: 20,
+                            view: 'button',
+                            type: 'iconButton',
+                            icon: 'plus',
+                            label: 'Add New Studio',
+                            align: 'right',
+                            autowidth: true
+                        }
+                    ],
                 },
                 {
                     view: 'datatable',
