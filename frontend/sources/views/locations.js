@@ -10,14 +10,13 @@ export default class Locations extends JetView {
                         {},
                         {
                             margin: 20,
+                            id: 'addNewEntryButton',
                             view: 'button',
                             type: 'iconButton',
                             icon: 'plus',
                             label: 'Add New Studio',
                             align: 'right',
-                            autowidth: true,
-                            click: '$$("studioPropsForm").clear(); ' +
-                            '$$("studioPropsModal").show();'
+                            autowidth: true
                         }
                     ],
                 },
@@ -60,7 +59,7 @@ export default class Locations extends JetView {
             ]
         };
     }
-
+    
     init() {
         webix.ajax().post('/locations').then(function (result) {
             result = result.json();
@@ -68,6 +67,12 @@ export default class Locations extends JetView {
         }).fail(function (err) {
             new Error(err);
         });
+    
+        $$('addNewEntryButton').attachEvent("onItemClick", function(id, e){
+            alert('!!!!!');
+        });
+
+
     }
 };
 
@@ -91,17 +96,18 @@ webix.ui({
             {view: 'text', attributes: {type: 'number'}, label: 'Staff Count', name: 'staff_count', labelWidth: 150},
             {
                 margin: 20, cols: [
-                    {
-                        view: 'button',
-                        value: 'Cancel',
-                        click: "$$('studioPropsModal').hide()"
-                    },
-                    {
-                        view: 'button',
-                        value: 'Save',
-                        id: 'saveEntryBtn'
-                    }
-                ]
+                {
+                    view: 'button',
+                    value: 'Cancel',
+                    click: "$$('studioPropsModal').hide()"
+                },
+                {
+                    view: 'button',
+                    value: 'Save',
+                    id: 'saveEntryBtn',
+                    click: onSaveEntry
+                }
+            ]
             }
         ]
     }
@@ -109,15 +115,23 @@ webix.ui({
 
 function rowDblClickHandler(data, some) {
     data = $$('locationsDt').getItem(data.row);
-
+    
+    onSaveEntry = onEditEntry;
     $$('studioPropsModal').show();
     $$('studioPropsForm').parse(data);
 }
 
-function onEditEntry () {
+function onSaveEntry() {
+    alert('save');
+}
+
+function onEditEntry() {
     alert('Edit');
 }
 
-function onNewEntry () {
+function onNewEntry() {
     alert('New');
 }
+
+
+
