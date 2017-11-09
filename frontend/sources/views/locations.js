@@ -15,7 +15,9 @@ export default class Locations extends JetView {
                             icon: 'plus',
                             label: 'Add New Studio',
                             align: 'right',
-                            autowidth: true
+                            autowidth: true,
+                            click: '$$("studioPropsForm").clear(); ' +
+                            '$$("studioPropsModal").show();'
                         }
                     ],
                 },
@@ -52,7 +54,7 @@ export default class Locations extends JetView {
                         onAfterLoad: function () {
                             this.hideOverlay();
                         },
-                        onItemDblClick: editRow
+                        onItemDblClick: rowDblClickHandler
                     }
                 }
             ]
@@ -69,6 +71,9 @@ export default class Locations extends JetView {
     }
 };
 
+/**
+ * Modal
+ */
 webix.ui({
     view: 'window',
     id: 'studioPropsModal',
@@ -91,16 +96,28 @@ webix.ui({
                         value: 'Cancel',
                         click: "$$('studioPropsModal').hide()"
                     },
-                    {view: 'button', value: 'Save'}
+                    {
+                        view: 'button',
+                        value: 'Save',
+                        id: 'saveEntryBtn'
+                    }
                 ]
             }
         ]
     }
 });
 
-function editRow(data, some) {
+function rowDblClickHandler(data, some) {
     data = $$('locationsDt').getItem(data.row);
-    
+
     $$('studioPropsModal').show();
     $$('studioPropsForm').parse(data);
+}
+
+function onEditEntry () {
+    alert('Edit');
+}
+
+function onNewEntry () {
+    alert('New');
 }
