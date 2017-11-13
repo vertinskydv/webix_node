@@ -1,5 +1,5 @@
 import {JetView} from 'webix-jet';
-import {data} from "../models/records";
+import URL from '../models/urls';
 
 export default class Locations extends JetView {
     config() {
@@ -18,7 +18,7 @@ export default class Locations extends JetView {
                             align: 'right',
                             autowidth: true
                         }
-                    ],
+                    ]
                 },
                 {
                     view: 'datatable',
@@ -31,48 +31,83 @@ export default class Locations extends JetView {
                             id: 'name',
                             header: ['Studio Name', {content: 'textFilter'}],
                             sort: 'string',
-                            fillspace: true,
+                            fillspace: true
                         },
                         {
                             id: 'address',
                             header: ['Address', {content: 'textFilter'}],
                             sort: 'string',
-                            fillspace: true,
+                            fillspace: true
                         },
                         {
                             id: 'staff_count',
                             header: ['Staff Count', {content: 'textFilter'}],
                             sort: 'int',
-                            width: 200,
+                            width: 200
                         }
                     ],
                     on: {
-                        onBeforeLoad: function () {
+                        onBeforeLoad() {
                             this.showOverlay('Loading...');
                         },
-                        onAfterLoad: function () {
+                        onAfterLoad() {
                             this.hideOverlay();
-                        },
-                        onItemDblClick: rowDblClickHandler
+                        }
                     }
                 }
             ]
         };
     }
-    
+
     init() {
-        webix.ajax().post('/locations').then(function (result) {
-            result = result.json();
-            $$('locationsDt').parse(result, 'json');
+        let onSaveEventId;
+        let datatable = $$('locationsDt');
+        let modal =  $$('studioPropsModal');
+        let form = $$('studioPropsForm');
+        let saveBtn = $$('saveEntryBtn');
+
+        form.bind(datatable);
+
+        // get and parse initial data
+        webix.ajax().post(URL.get_locations).then(function (result) {
+            datatable.parse(result.json(), 'json');
         }).fail(function (err) {
-            new Error(err);
-        });
-    
-        $$('addNewEntryButton').attachEvent("onItemClick", function(id, e){
-            alert('!!!!!');
+            throw new Error(err);
         });
 
 
+        // add new datatable row
+        $$('addNewEntryButton').attachEvent('onItemClick', function (id, e) {
+            modal.show();
+            form.clear();
+            onSaveEventId && saveBtn.detachEvent(onSaveEventId);
+
+            onSaveEventId = saveBtn.attachEvent('onItemClick', function () {
+                let formData = form.getValues();
+                webix.ajax().post(URL.new_location, formData).then((data) => {
+                    datatable.add(data.json());
+                }).fail((err) => {
+                    throw new Error(err);
+                });
+                modal.hide();
+            });
+        });
+
+        // edit existing datatable row
+        datatable.attachEvent('onItemDblClick', function (data) {
+            data = datatable.getItem(data.row);
+            modal.show();
+            // form.parse(data);
+            onSaveEventId && saveBtn.detachEvent(onSaveEventId);
+
+            onSaveEventId = saveBtn.attachEvent('onItemClick', () => {
+                let formData = form.getValues();
+
+                form.save();
+                webix.ajax().post(URL.edit_location, formData);
+                modal.hide();
+            });
+        });
     }
 };
 
@@ -96,42 +131,19 @@ webix.ui({
             {view: 'text', attributes: {type: 'number'}, label: 'Staff Count', name: 'staff_count', labelWidth: 150},
             {
                 margin: 20, cols: [
-                {
-                    view: 'button',
-                    value: 'Cancel',
-                    click: "$$('studioPropsModal').hide()"
-                },
-                {
-                    view: 'button',
-                    value: 'Save',
-                    id: 'saveEntryBtn',
-                    click: onSaveEntry
-                }
-            ]
+                    {
+                        view: 'button',
+                        value: 'Cancel',
+                        click: "$$('studioPropsModal').hide()"
+                    },
+                    {
+                        view: 'button',
+                        value: 'Save',
+                        id: 'saveEntryBtn'
+                    }
+                ]
             }
         ]
     }
 });
-
-function rowDblClickHandler(data, some) {
-    data = $$('locationsDt').getItem(data.row);
-    
-    onSaveEntry = onEditEntry;
-    $$('studioPropsModal').show();
-    $$('studioPropsForm').parse(data);
-}
-
-function onSaveEntry() {
-    alert('save');
-}
-
-function onEditEntry() {
-    alert('Edit');
-}
-
-function onNewEntry() {
-    alert('New');
-}
-
-
 
