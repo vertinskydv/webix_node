@@ -14,6 +14,13 @@ export default class ToolBar extends JetView {
             ]
         };
     }
+
+    init() {
+        $$('refresh').attachEvent('onItemClick', function (id, e) {
+            let datatable = $$('locationsDt');
+            datatable.clearAll();
+        });
+    }
 }
 
 let mainToolbar = {
@@ -25,7 +32,9 @@ let mainToolbar = {
             view: 'label',
             css: 'logo',
             label: '<span class="logo"><span class="logo__name">Book a studio</span> owner app</span>'
-        }
+        },
+        {view: 'button', id: 'refresh', type: 'icon', icon: 'refresh', width: 30},
+        {view: 'button', type: 'icon', icon: 'share-square', width: 30}
     ]
 };
 
@@ -33,7 +42,8 @@ let leftMenuUiData = [
     {
         id: 'locations',
         icon: 'home',
-        value: 'Locations'
+        value: 'Locations',
+        name: 'locations',
     },
     {
         id: 'staff',

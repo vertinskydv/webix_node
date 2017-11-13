@@ -39,4 +39,12 @@ module.exports = function (app) {
             res.status(200).send();
         });
     });
+
+    app.post('/delete_location', (req, res) => {
+        let data = req.body;
+        db.query(`DELETE FROM studios WHERE id = '${data.id}'`, (err, rows, fields) => {
+            if (err) res.status(500).send({error: err.message});
+            res.status(200).send();
+        });
+    });
 };

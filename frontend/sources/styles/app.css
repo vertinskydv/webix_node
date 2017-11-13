@@ -1,0 +1,24 @@
+.logo {
+    font-size: 12px;
+}
+
+.logo__name {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.btn-danger button {
+    background-color: red;
+}
+
+.btn-danger button:hover {
+    background-color: #D80000;
+}
+
+.btn-danger button:focus {
+    background-color: #D80000;
+}
+
+.btn-danger button:active {
+    background-color: #B10000;
+}
