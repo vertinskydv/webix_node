@@ -30,6 +30,7 @@ module.exports = function (app) {
                 delete rowObject.staff_id;
                 return rowObject;
             })
+            
             res.send(rows);
         });
     });
