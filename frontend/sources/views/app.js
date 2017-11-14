@@ -1,4 +1,5 @@
-import {JetView} from 'webix-jet';
+import {JetView, plugins} from 'webix-jet';
+import {getLocations} from '../models/queries';
 
 export default class ToolBar extends JetView {
     config() {
@@ -16,10 +17,26 @@ export default class ToolBar extends JetView {
     }
 
     init() {
-        $$('refresh').attachEvent('onItemClick', function (id, e) {
+        // refresh button handler
+        $$('refreshBtn').attachEvent('onItemClick', function (id, e) {
             let datatable = $$('locationsDt');
+
             datatable.clearAll();
+            getLocations().then((data) => {
+                datatable.parse(data.json(), 'json');
+            }).fail((error) => {
+                throw new Error(error);
+            });
         });
+
+        // export to excel button handler
+        $$('exportToExcelBtn').attachEvent('onItemClick', () => {
+            let datatable = $$('locationsDt');
+            webix.toExcel(datatable);
+        });
+
+
+        this.use(plugins.Menu, 'app:nav');
     }
 }
 
@@ -33,8 +50,8 @@ let mainToolbar = {
             css: 'logo',
             label: '<span class="logo"><span class="logo__name">Book a studio</span> owner app</span>'
         },
-        {view: 'button', id: 'refresh', type: 'icon', icon: 'refresh', width: 30},
-        {view: 'button', type: 'icon', icon: 'share-square', width: 30}
+        {view: 'button', id: 'refreshBtn', type: 'icon', icon: 'refresh', width: 30},
+        {view: 'button', id: 'exportToExcelBtn', type: 'icon', icon: 'share-square', width: 30}
     ]
 };
 
@@ -43,7 +60,7 @@ let leftMenuUiData = [
         id: 'locations',
         icon: 'home',
         value: 'Locations',
-        name: 'locations',
+        name: 'locations'
     },
     {
         id: 'staff',
@@ -76,7 +93,7 @@ let leftMenuUiData = [
 
 let navigation = {
     view: 'sidebar',
-    id: 'nav',
+    id: 'app:nav',
     data: leftMenuUiData
 };
 

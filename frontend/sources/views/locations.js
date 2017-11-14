@@ -1,5 +1,4 @@
 import {JetView} from 'webix-jet';
-import URL from '../models/urls';
 import {getLocations, addLocation, editLocation, deleteLocation} from '../models/queries';
 
 export default class Locations extends JetView {
@@ -72,8 +71,6 @@ export default class Locations extends JetView {
 
         form.bind(datatable);
 
-        $$('nav').select('locations');
-
         // get and parse initial data
         getLocations().then(function (result) {
             datatable.parse(result.json(), 'json');
@@ -117,10 +114,10 @@ export default class Locations extends JetView {
 
         deleteButton.attachEvent('onItemClick', () => {
             let formData = form.getValues();
+            datatable.remove(formData.id);
             deleteLocation(formData);
             modal.hide();
             confirmDeleteModal.hide();
-            datatable.remove(formData.id);
         });
     }
 };
