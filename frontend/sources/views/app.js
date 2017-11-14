@@ -16,6 +16,14 @@ export default class ToolBar extends JetView {
         };
     }
 
+    urlChange(view, url) {
+        if (url[1].page === 'locations') {
+            $$('toolbarButtons').show();
+        } else {
+            $$('toolbarButtons').hide();
+        }
+    }
+
     init() {
         // refresh button handler
         $$('refreshBtn').attachEvent('onItemClick', function (id, e) {
@@ -35,7 +43,6 @@ export default class ToolBar extends JetView {
             webix.toExcel(datatable);
         });
 
-
         this.use(plugins.Menu, 'app:nav');
     }
 }
@@ -50,8 +57,13 @@ let mainToolbar = {
             css: 'logo',
             label: '<span class="logo"><span class="logo__name">Book a studio</span> owner app</span>'
         },
-        {view: 'button', id: 'refreshBtn', type: 'icon', icon: 'refresh', width: 30},
-        {view: 'button', id: 'exportToExcelBtn', type: 'icon', icon: 'share-square', width: 30}
+        {
+            id: 'toolbarButtons',
+            cols: [
+                {view: 'button', id: 'refreshBtn', type: 'icon', icon: 'refresh', width: 30},
+                {view: 'button', id: 'exportToExcelBtn', type: 'icon', icon: 'share-square', width: 30}
+            ]
+        }
     ]
 };
 

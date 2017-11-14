@@ -88,6 +88,7 @@ export default class Locations extends JetView {
             onSaveEventId = saveBtn.attachEvent('onItemClick', () => {
                 let formData = form.getValues();
                 addLocation(formData).then((data) => {
+                    debugger;
                     datatable.add(data.json());
                 }).fail((err) => {
                     throw new Error(err);
@@ -139,7 +140,6 @@ webix.ui({
         elements: [
             {view: 'text', label: 'Studio Name', name: 'name', labelWidth: 150},
             {view: 'text', label: 'Address', name: 'address', labelWidth: 150},
-            {view: 'text', attributes: {type: 'number'}, label: 'Staff Count', name: 'staff_count', labelWidth: 150},
             {
                 margin: 20,
                 id: 'modalButtons',
