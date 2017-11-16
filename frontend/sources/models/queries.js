@@ -20,8 +20,8 @@ export function getStaffModalFormContent() {
     return webix.ajax().post(URL.get_staff_modal_form);
 }
 
-export function getStaff() {
-    return webix.ajax().post(URL.get_staff);
+export function getStaff(data) {
+    return webix.ajax().post(URL.get_staff, data);
 }
 
 export function addNewEmployee(data) {

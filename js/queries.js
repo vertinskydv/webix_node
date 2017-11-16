@@ -16,6 +16,8 @@ module.exports = function (app) {
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(bodyParser.json());
 
+    // Locations page queries
+    // ============================================
     app.post('/locations', (req, res) => {
         db.query('SELECT * FROM studios ORDER BY name', (err, rows, fields) => {
             if (err) throw err;
@@ -59,38 +61,49 @@ module.exports = function (app) {
             res.status(200).send();
         });
     });
+    // ============================================
+    // End Locations page queries
 
+    // Staff page queries
+    // ============================================
     app.post('/get_staff', (req, res) => {
-
-        // let getStaff = new Promise ((resolve, reject) => {
-        db.query(`
+        let data = req.body;
+        if (!data.filter && !data.item_id) {
+            db.query(`
                 SELECT 
                     staff.id, staff.name, staff.rate, staff.position, studios.name AS studio_name
                 FROM staff 
                 LEFT JOIN studios
                 ON staff.studio_id=studios.id
-                ORDER BY staff.name`, (err, rows, fields) => {
-                if (err) res.status(500).send({ error: err.message });
-                res.status(200).send(rows);
-            });
-        // });
+                ORDER BY staff.name
+                LIMIT 0, 40`,
+                (err, rows, fields) => {
+                    if (err) res.status(500).send({ error: err.message });
+                    res.status(200).send(rows);
+                });
+        }
+
     });
 
     app.post('/get_staff_modal_form', (req, res) => {
         let getPositions = new Promise((resolve, reject) => {
-            db.query(`SELECT * FROM positions`, (err, data) => {
-                if (err) reject(err);
-                resolve(data);
-            });
+            db.query(`
+                SELECT * FROM positions`,
+                (err, data) => {
+                    if (err) reject(err);
+                    resolve(data);
+                });
         });
 
 
         let getStudios = new Promise((resolve, reject) => {
             let result;
-            db.query(`SELECT id, name AS value FROM studios`, (err, data) => {
-                if (err) reject(err);
-                resolve(data);
-            });
+            db.query(`
+                SELECT id, name AS value FROM studios`,
+                (err, data) => {
+                    if (err) reject(err);
+                    resolve(data);
+                });
         });
 
         Promise.all([getPositions, getStudios]).then((data) => {
@@ -102,21 +115,21 @@ module.exports = function (app) {
         let data = req.body;
         let currentEmployeeId = data.id = uniqid()
         db.query(`
-        INSERT INTO staff (id, name, position, rate, studio_id)
-        VALUES ('${currentEmployeeId}', '${data.name}', '${data.position}', '${data.rate}', '${data.studio_id}')
-        `, (err, rows, fields) => {
+            INSERT INTO staff (id, name, position, rate, studio_id)
+            VALUES ('${currentEmployeeId}', '${data.name}', '${data.position}', '${data.rate}', '${data.studio_id}')`,
+        (err, rows, fields) => {
             if (err) res.status(500).send({ error: err.message });
         });
 
         db.query(`
-        SELECT name AS studio_name
-        FROM studios
-        WHERE id='${data.studio_id}'
-        `, (err, rows, fields) => {
-            if (err) res.status(500).send({ error: err.message });
-            data.studio_name = rows[0].studio_name;
-            res.send(data);
-        });
+            SELECT name AS studio_name
+            FROM studios
+            WHERE id='${data.studio_id}'`,
+            (err, rows, fields) => {
+                if (err) res.status(500).send({ error: err.message });
+                data.studio_name = rows[0].studio_name;
+                res.send(data);
+            });
 
         db.query(`SELECT staff_id FROM studios WHERE id='${data.studio_id}'`, (err, rows, fields) => {
             if (err) res.status(500).send({ error: err.message });
@@ -135,8 +148,8 @@ module.exports = function (app) {
             });
         });
     });
+    // ============================================
+    // End Staff page queries
 
-    app.get('/aw', (req, res) => {
-        res.send([{id: '1', name: 'ara'}]);
-    });
+
 };

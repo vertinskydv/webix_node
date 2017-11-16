@@ -60,8 +60,7 @@ export default class Staff extends JetView {
                         onAfterLoad() {
                             this.hideOverlay();
                         }
-                    },
-                    url: '/aw'
+                    }
                 }
             ]
         };
@@ -73,6 +72,8 @@ export default class Staff extends JetView {
         let modalForm;
         let modal;
         let addEmployeeBtn;
+
+        webix.extend(datatable, webix.ProgressBar);
 
         getStaff().then((data) => {
             datatable.parse(data.json(), 'json');
@@ -182,14 +183,22 @@ export default class Staff extends JetView {
             });
         });
 
-        datatable.attachEvent("onScrollY", function(e){
-            let tableparent = datatable.getTopParentView();
-            console.log(datatable.$getSize());
-            // console.log(tableparent.$height);
-            console.log(datatable.getScrollState());
-        })
+        let scrollEvent = datatable.attachEvent('onScrollY', () => {
+            let lastRowId = datatable.getLastId();
+            let rowsCount = datatable.count();
+            let rowH = datatable.config.rowHeight;
 
+            if (datatable.getScrollState().y + datatable.Vj === rowsCount * rowH) {
 
+                getStaff({item_id: lastRowId}).then((data) => {
+                    debugger;
+                });
+
+                datatable.showProgress({
+                    type: 'bottom',
+                });
+            }
+        });
     }
 };
 
