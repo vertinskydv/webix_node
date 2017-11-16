@@ -15,3 +15,15 @@ export function editLocation(data) {
 export function deleteLocation(data) {
     return webix.ajax().post(URL.delete_location, data);
 }
+
+export function getStaffModalFormContent() {
+    return webix.ajax().post(URL.get_staff_modal_form);
+}
+
+export function getStaff() {
+    return webix.ajax().post(URL.get_staff);
+}
+
+export function addNewEmployee(data) {
+    return webix.ajax().post(URL.add_employee, data);
+}
