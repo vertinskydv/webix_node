@@ -66,43 +66,14 @@ module.exports = function (app) {
 
     // Staff page queries
     // ============================================
-    app.post('/get_staff', (req, res) => {
-        let data = req.body;
-        if (!data.filter && !data.rows) {
-            db.query(`
-                SELECT 
-                    staff.id, staff.name, staff.rate, staff.position, studios.name AS studio_name
-                FROM staff 
-                LEFT JOIN studios
-                ON staff.studio_id=studios.id
-                ORDER BY staff.name
-                LIMIT 0, 40`,
-                (err, rows, fields) => {
-                    if (err) res.status(500).send({ error: err.message });
-                    res.status(200).send(rows);
-                });
-        }
-        if (!data.filter && data.rows) {
-            db.query(`
-                SELECT 
-                    staff.id, staff.name, staff.rate, staff.position, studios.name AS studio_name
-                FROM staff 
-                LEFT JOIN studios
-                ON staff.studio_id=studios.id
-                ORDER BY staff.name
-                LIMIT ${data.rows}, 40`,
-                (err, rows, fields) => {
-                    if (err) res.status(500).send({ error: err.message });
-                    res.status(200).send(rows);
-                });
-        }
-
-    });
 
     app.post('/get_staff_modal_form', (req, res) => {
         let getPositions = new Promise((resolve, reject) => {
             db.query(`
-                SELECT * FROM positions`,
+                SELECT 
+                    * 
+                FROM 
+                    positions`,
                 (err, data) => {
                     if (err) reject(err);
                     resolve(data);
@@ -113,7 +84,10 @@ module.exports = function (app) {
         let getStudios = new Promise((resolve, reject) => {
             let result;
             db.query(`
-                SELECT id, name AS value FROM studios`,
+                SELECT  
+                    id, name AS value 
+                FROM 
+                    studios`,
                 (err, data) => {
                     if (err) reject(err);
                     resolve(data);
@@ -129,16 +103,21 @@ module.exports = function (app) {
         let data = req.body;
         let currentEmployeeId = data.id = uniqid()
         db.query(`
-            INSERT INTO staff (id, name, position, rate, studio_id)
-            VALUES ('${currentEmployeeId}', '${data.name}', '${data.position}', '${data.rate}', '${data.studio_id}')`,
+            INSERT INTO 
+                staff (id, name, position, rate, studio_id)
+            VALUES 
+                ('${currentEmployeeId}', '${data.name}', '${data.position}', '${data.rate}', '${data.studio_id}')`,
         (err, rows, fields) => {
             if (err) res.status(500).send({ error: err.message });
         });
 
         db.query(`
-            SELECT name AS studio_name
-            FROM studios
-            WHERE id='${data.studio_id}'`,
+            SELECT 
+                name AS studio_name
+            FROM 
+                studios
+            WHERE 
+                id='${data.studio_id}'`,
             (err, rows, fields) => {
                 if (err) res.status(500).send({ error: err.message });
                 data.studio_name = rows[0].studio_name;
@@ -172,8 +151,64 @@ module.exports = function (app) {
                 if (err) res.status(500).send({ error: err.message });
             });
     });
+
+    app.get('/staff', (req, res) => {
+        let data = req.query;
+        (typeof data.filter == 'string') && (data.filter = JSON.parse(data.filter));
+        (typeof data.sort == 'string') && (data.sort = JSON.parse(data.sort));
+        removeEmptyProps(data, 'filter');
+
+        let queryCode = `
+        SELECT 
+            staff.id, staff.name, staff.rate, staff.position, studios.name AS studio_name
+        FROM 
+            staff 
+        LEFT JOIN 
+            studios
+        ON 
+            staff.studio_id=studios.id`;
+
+        if (data.filter) {
+            queryCode += `
+            WHERE`;
+            for (let key in data.filter) {
+                queryCode += ` '${key}' LIKE '%${data.filter[key]}%'`;
+            };
+        }
+
+        queryCode +=` 
+        ORDER BY 
+            staff.name
+        LIMIT 
+            ${data.rows ? data.rows : 0}, 40;`;
+
+
+        db.query(queryCode, (err, rows) => {
+            if (err) res.status(500).send({ error: err.message });
+            res.status(200).send(rows);
+        });
+    });
     // ============================================
     // End Staff page queries
-
-
 };
+
+// helper functions
+// ===========================================
+function removeEmptyProps(parObj, objKey) {
+    let obj = parObj[objKey];
+    if (!obj) {
+        return;
+    }
+
+    for (let key in obj) {
+        if (!obj[key]) {
+            delete obj[key];
+        }
+    }
+
+    if  (Object.keys(obj).length === 0) {
+        delete parObj[objKey];
+    }
+}
+// ===========================================
+// end helper functions

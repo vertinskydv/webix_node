@@ -21,7 +21,7 @@ export function getStaffModalFormContent() {
 }
 
 export function getStaff(data) {
-    return webix.ajax().post(URL.get_staff, data);
+    return webix.ajax().get(URL.get_staff, data);
 }
 
 export function addNewEmployee(data) {

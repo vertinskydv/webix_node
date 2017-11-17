@@ -41,8 +41,8 @@ export default class Staff extends JetView {
                     columns: [
                         {
                             id: 'name',
-                            header: ['Name', { content: 'textFilter' }],
-                            sort: 'string',
+                            header: ['Name', { content: 'serverFilter' }],
+                            sort: 'server',
                             fillspace: true
                         },
                         {
@@ -78,7 +78,8 @@ export default class Staff extends JetView {
                             webix.extend(this, webix.OverlayBox);
                             this.showOverlay("<div style='...'>There is no data</div>");
                         }
-                    }
+                    },
+                    url: '/staff'
                 }
             ]
         };
@@ -91,14 +92,20 @@ export default class Staff extends JetView {
         let modalForm;
         let modal;
         let addEmployeeBtn;
+        let sortInfo = {};
 
         webix.extend(datatable, webix.ProgressBar);
 
-        getStaff().then((data) => {
-            datatable.parse(data.json(), 'json');
-        }).fail((error) => {
-            throw new Error(error);
+        // get datatable sort info
+        datatable.attachEvent('onBeforeSort', (by, dir) => {
+            sortInfo[by] = dir;
         });
+
+        // getStaff().then((data) => {
+        //     datatable.parse(data.json(), 'json');
+        // }).fail((error) => {
+        //     throw new Error(error);
+        // });
 
         /**
          * get form data and init Add New Employee form
@@ -206,15 +213,27 @@ export default class Staff extends JetView {
             let rowsCount = datatable.count();
             let rowH = datatable.config.rowHeight;
 
+            // if the table is scrolled to the bottom
             if (datatable.getScrollState().y + datatable.Vj !== rowsCount * rowH) {
                 return;
+            }
+
+            let filter = datatable.getState().filter;
+            let sort = sortInfo;
+            let filterData = {
+                rows: rowsCount, 
+                filter: filter, 
+            }
+
+            if (Object.keys(sort).length) {
+                filterData.sort = sort;
             }
 
             datatable.showProgress({
                 type: 'bottom'
             });
 
-            getStaff({ rows: rowsCount }).then((data) => {
+            getStaff(filterData).then((data) => {
                 data = data.json();
                 data.forEach((row) => {
                     datatable.add(row);
@@ -236,7 +255,7 @@ export default class Staff extends JetView {
         $$('deleteButton').attachEvent('onItemClick', () => {
             let selectedInfo = datatable.getSelectedId();
             let selectedId;
-            debugger;
+            // debugger;
             if (!selectedInfo) {
                 return;
             }
@@ -246,6 +265,7 @@ export default class Staff extends JetView {
             datatable.remove(selectedId);
             $$('confirmDeleteModal').hide();
         });
+
     }
 };
 
