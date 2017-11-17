@@ -162,6 +162,16 @@ module.exports = function (app) {
             });
         });
     });
+
+    app.post('/remove_employee', (req, res) => {
+        let id = req.body.id;
+        console.log(id);
+        db.query(`
+            DELETE FROM staff WHERE id = '${id}'`,
+            (err, rows) => {
+                if (err) res.status(500).send({ error: err.message });
+            });
+    });
     // ============================================
     // End Staff page queries
 

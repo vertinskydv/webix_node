@@ -1,5 +1,6 @@
 import { JetView } from 'webix-jet';
-import { getStaffModalFormContent, addNewEmployee, getStaff } from '../models/queries';
+import { getStaffModalFormContent, addNewEmployee, getStaff, removeEmployee } from '../models/queries';
+import '../models/confirm-delete-modal';
 
 export default class Staff extends JetView {
     config() {
@@ -8,6 +9,17 @@ export default class Staff extends JetView {
                 {
                     cols: [
                         {},
+                        {
+                            margin: 20,
+                            id: 'removeEmployeeButton',
+                            view: 'button',
+                            type: 'iconButton',
+                            icon: 'times',
+                            label: 'Remove Employee',
+                            align: 'right',
+                            autowidth: true,
+                            css: 'btn-danger'
+                        },
                         {
                             margin: 20,
                             id: 'addNewEmployeeButton',
@@ -61,7 +73,7 @@ export default class Staff extends JetView {
                             this.hideOverlay();
                         }
                     },
-                    ready: function() {
+                    ready: function () {
                         if (!this.count()) { // if no data is available
                             webix.extend(this, webix.OverlayBox);
                             this.showOverlay("<div style='...'>There is no data</div>");
@@ -74,6 +86,7 @@ export default class Staff extends JetView {
 
     init() {
         let addEmployeeModalBtn = $$('addNewEmployeeButton');
+        let removeEmployeeBtn = $$('removeEmployeeButton');
         let datatable = $$('staffDt');
         let modalForm;
         let modal;
@@ -193,26 +206,46 @@ export default class Staff extends JetView {
             let rowsCount = datatable.count();
             let rowH = datatable.config.rowHeight;
 
-            if (datatable.getScrollState().y + datatable.Vj === rowsCount * rowH) {
-                datatable.showProgress({
-                    type: 'bottom'
-                });
-
-                getStaff({rows: rowsCount}).then((data) => {
-                    data = data.json();
-                    data.forEach((row) => {
-                        datatable.add(row);
-                    })
-                    datatable.showProgress({
-                        type: 'bottom',
-                        hide: true
-                    });
-                }).fail((err) => {
-                    throw new Error(err);
-                });
-
-
+            if (datatable.getScrollState().y + datatable.Vj !== rowsCount * rowH) {
+                return;
             }
+
+            datatable.showProgress({
+                type: 'bottom'
+            });
+
+            getStaff({ rows: rowsCount }).then((data) => {
+                data = data.json();
+                data.forEach((row) => {
+                    datatable.add(row);
+                });
+                datatable.hideProgress();
+            }).fail((err) => {
+                throw new Error(err);
+            });
+        });
+
+        removeEmployeeBtn.attachEvent('onItemClick', () => {
+            let selectedInfo = datatable.getSelectedId();
+            if (!selectedInfo) {
+                return;
+            }
+            $$('confirmDeleteModal').show();
+        });
+
+        $$('deleteButton').attachEvent('onItemClick', () => {
+            let selectedInfo = datatable.getSelectedId();
+            let selectedId;
+            debugger;
+            if (!selectedInfo) {
+                return;
+            }
+
+            selectedId = selectedInfo.id;
+            removeEmployee({id: selectedId});
+            datatable.remove(selectedId);
+            $$('confirmDeleteModal').hide();
         });
     }
 };
+

@@ -1,5 +1,6 @@
 import {JetView} from 'webix-jet';
 import {getLocations, addLocation, editLocation, deleteLocation} from '../models/queries';
+import '../models/confirm-delete-modal';
 
 export default class Locations extends JetView {
     config() {
@@ -162,31 +163,6 @@ webix.ui({
                         id: 'saveEntryBtn'
                     }
                 ]
-            }
-        ]
-    }
-});
-
-webix.ui({
-    view: 'window',
-    id: 'confirmDeleteModal',
-    head: 'Are you shure?',
-    position: 'top',
-    modal: true,
-    move: true,
-    width: 500,
-    body: {
-        cols: [
-            {
-                view: 'button',
-                value: 'No',
-                click: "$$('confirmDeleteModal').hide()"
-            },
-            {
-                view: 'button',
-                id: 'deleteButton',
-                value: 'Yes',
-                css: 'btn-danger'
             }
         ]
     }

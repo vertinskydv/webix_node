@@ -27,3 +27,7 @@ export function getStaff(data) {
 export function addNewEmployee(data) {
     return webix.ajax().post(URL.add_employee, data);
 }
+
+export function removeEmployee(data) {
+    return webix.ajax().post(URL.remove_employee, data);
+}
