@@ -68,7 +68,7 @@ module.exports = function (app) {
     // ============================================
     app.post('/get_staff', (req, res) => {
         let data = req.body;
-        if (!data.filter && !data.item_id) {
+        if (!data.filter && !data.rows) {
             db.query(`
                 SELECT 
                     staff.id, staff.name, staff.rate, staff.position, studios.name AS studio_name
@@ -77,6 +77,20 @@ module.exports = function (app) {
                 ON staff.studio_id=studios.id
                 ORDER BY staff.name
                 LIMIT 0, 40`,
+                (err, rows, fields) => {
+                    if (err) res.status(500).send({ error: err.message });
+                    res.status(200).send(rows);
+                });
+        }
+        if (!data.filter && data.rows) {
+            db.query(`
+                SELECT 
+                    staff.id, staff.name, staff.rate, staff.position, studios.name AS studio_name
+                FROM staff 
+                LEFT JOIN studios
+                ON staff.studio_id=studios.id
+                ORDER BY staff.name
+                LIMIT ${data.rows}, 40`,
                 (err, rows, fields) => {
                     if (err) res.status(500).send({ error: err.message });
                     res.status(200).send(rows);

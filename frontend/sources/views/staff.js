@@ -60,6 +60,12 @@ export default class Staff extends JetView {
                         onAfterLoad() {
                             this.hideOverlay();
                         }
+                    },
+                    ready: function() {
+                        if (!this.count()) { // if no data is available
+                            webix.extend(this, webix.OverlayBox);
+                            this.showOverlay("<div style='...'>There is no data</div>");
+                        }
                     }
                 }
             ]
@@ -183,26 +189,30 @@ export default class Staff extends JetView {
             });
         });
 
-        let scrollEvent = datatable.attachEvent('onScrollY', () => {
-            let lastRowId = datatable.getLastId();
+        datatable.attachEvent('onScrollY', () => {
             let rowsCount = datatable.count();
             let rowH = datatable.config.rowHeight;
 
             if (datatable.getScrollState().y + datatable.Vj === rowsCount * rowH) {
-
-                getStaff({item_id: lastRowId}).then((data) => {
-                    debugger;
-                });
-
                 datatable.showProgress({
-                    type: 'bottom',
+                    type: 'bottom'
                 });
+
+                getStaff({rows: rowsCount}).then((data) => {
+                    data = data.json();
+                    data.forEach((row) => {
+                        datatable.add(row);
+                    })
+                    datatable.showProgress({
+                        type: 'bottom',
+                        hide: true
+                    });
+                }).fail((err) => {
+                    throw new Error(err);
+                });
+
+
             }
         });
     }
 };
-
-/**
- * Modal
- */
-
