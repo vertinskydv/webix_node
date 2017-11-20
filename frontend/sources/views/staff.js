@@ -47,20 +47,20 @@ export default class Staff extends JetView {
                         },
                         {
                             id: 'position',
-                            header: ['Position', { content: 'textFilter' }],
-                            sort: 'string',
+                            header: ['Position', { content: 'serverFilter' }],
+                            sort: 'server',
                             fillspace: true
                         },
                         {
                             id: 'rate',
-                            header: ['Rate', { content: 'textFilter' }],
-                            sort: 'int',
+                            header: ['Rate', { content: 'serverFilter' }],
+                            sort: 'server',
                             width: 200
                         },
                         {
                             id: 'studio_name',
-                            header: ['Studio', { content: 'textFilter' }],
-                            sort: 'string',
+                            header: ['Studio', { content: 'serverFilter' }],
+                            sort: 'server',
                             fillspace: true
 
                         }
@@ -245,14 +245,16 @@ export default class Staff extends JetView {
         });
 
         removeEmployeeBtn.attachEvent('onItemClick', () => {
-            let selectedInfo = datatable.getSelectedId();
-            if (!selectedInfo) {
-                return;
-            }
-            $$('confirmDeleteModal').show();
+            console.log(this.app);
+            // let selectedInfo = datatable.getSelectedId();
+            // if (!selectedInfo) {
+            //     return;
+            // }
+            // $$('confirmDeleteModal').show();
         });
 
         $$('deleteButton').attachEvent('onItemClick', () => {
+            debugger;
             let selectedInfo = datatable.getSelectedId();
             let selectedId;
             // debugger;

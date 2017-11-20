@@ -1,6 +1,7 @@
 import {JetView} from 'webix-jet';
 import {getLocations, addLocation, editLocation, deleteLocation} from '../models/queries';
-import '../models/confirm-delete-modal';
+import ConfirmDeleteModal from './confirm-delete-modal';
+
 
 export default class Locations extends JetView {
     config() {
@@ -54,6 +55,12 @@ export default class Locations extends JetView {
                         onAfterLoad() {
                             this.hideOverlay();
                         }
+                    },
+                    ready() {
+                        if (!this.count()) { // if no data is available
+                            webix.extend(this, webix.OverlayBox);
+                            this.showOverlay("<div style='...'>There is no data</div>");
+                        }
                     }
                 }
             ]
@@ -64,7 +71,7 @@ export default class Locations extends JetView {
         let onSaveEventId;
         let datatable = $$('locationsDt');
         let modal =  $$('studioPropsModal');
-        let confirmDeleteModal = $$('confirmDeleteModal');
+        let confirmDeleteModal = this.ui(ConfirmDeleteModal);
         let form = $$('studioPropsForm');
         let saveBtn = $$('saveEntryBtn');
         let modalButtons =  $$('modalButtons');
@@ -81,9 +88,11 @@ export default class Locations extends JetView {
 
         // add new datatable row
         $$('addNewEntryButton').attachEvent('onItemClick', (id, e) => {
-            modal.show();
-            form.clear();
+
             $$('preDeleteBtn').hide();
+            form.clear();
+            modal.show();
+
             onSaveEventId && saveBtn.detachEvent(onSaveEventId);
 
             onSaveEventId = saveBtn.attachEvent('onItemClick', () => {
@@ -120,6 +129,10 @@ export default class Locations extends JetView {
             modal.hide();
             confirmDeleteModal.hide();
         });
+
+        this.app.attachEvent("confirm:delete", function(){
+            alert('!!!!');
+        });   
     }
 };
 
@@ -155,7 +168,7 @@ webix.ui({
                         id: 'preDeleteBtn',
                         width: 100,
                         css: 'btn-danger',
-                        click: "$$('confirmDeleteModal').show()"
+                        click: `$$('confirmDeleteModal').show()`
                     },
                     {
                         view: 'button',

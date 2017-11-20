@@ -166,19 +166,63 @@ module.exports = function (app) {
         LEFT JOIN 
             studios
         ON 
-            staff.studio_id=studios.id`;
+            staff.studio_id=studios.id
+        `;
 
+        // set filter
         if (data.filter) {
-            queryCode += `
-            WHERE`;
-            for (let key in data.filter) {
-                queryCode += ` '${key}' LIKE '%${data.filter[key]}%'`;
-            };
+            let filterData = data.filter;
+            let flterKeys = Object.keys(filterData);
+            let filterLength = flterKeys.length;
+
+            queryCode += `WHERE`;
+            flterKeys.forEach((key, index) => {
+                switch (key) {
+                    case 'studio_name':
+                        queryCode += ` studios.name LIKE '%${data.filter[key]}%'`;
+                        break;
+
+                    default:
+                        queryCode += ` staff.${key} LIKE '%${data.filter[key]}%'`;
+                        break;
+                }
+                (index + 1 !== filterLength) && (queryCode += ' AND');
+            });
         }
 
-        queryCode +=` 
-        ORDER BY 
-            staff.name
+
+        removeEmptyProps(data, 'sort');
+        //set order
+        if (data.sort) {
+            let sortData = data.sort;
+            let sortKey = Object.keys(sortData)[0];
+            let desc = (sortData[sortKey] === 'desc') ? ' DESC' : '';
+
+            switch (sortKey) {
+                case 'name':
+                    queryCode += ` ORDER BY staff.name`;
+                    break;
+                case 'position':
+                    queryCode += ` ORDER BY staff.position`;
+                    break;
+                case 'rate':
+                    queryCode += ` ORDER BY staff.rate`;
+                    break;
+                case 'studio_name':
+                    queryCode += ` ORDER BY studios.name`;
+                    break;
+                default:
+                    break;
+            }
+            queryCode += desc;
+        } else {
+            queryCode += ` 
+            ORDER BY
+                staff.name`;
+        }
+
+        // set limit
+        queryCode += `
         LIMIT 
             ${data.rows ? data.rows : 0}, 40;`;
 
@@ -194,6 +238,15 @@ module.exports = function (app) {
 
 // helper functions
 // ===========================================
+
+/**
+ * Removes object properties that do not contain useful information.
+ * If the object becomes empty - the object itself.
+ * 
+ * @param {*} parObj - parent object.
+ * @param {*} objKey - the key to the object, which the need to clean.
+ * @returns none
+ */
 function removeEmptyProps(parObj, objKey) {
     let obj = parObj[objKey];
     if (!obj) {
