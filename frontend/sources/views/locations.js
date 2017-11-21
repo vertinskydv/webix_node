@@ -71,7 +71,6 @@ export default class Locations extends JetView {
         let onSaveEventId;
         let datatable = $$('locationsDt');
         let modal =  $$('studioPropsModal');
-        let confirmDeleteModal = this.ui(ConfirmDeleteModal);
         let form = $$('studioPropsForm');
         let saveBtn = $$('saveEntryBtn');
         let modalButtons =  $$('modalButtons');
