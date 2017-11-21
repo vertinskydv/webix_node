@@ -5,6 +5,48 @@ import ConfirmDeleteModal from './confirm-delete-modal';
 
 export default class Locations extends JetView {
     config() {
+        let datatable = {
+            view: 'datatable',
+            id: 'locationsDt',
+            editable: true,
+            editaction: 'dblclick',
+            select: 'row',
+            columns: [
+                {
+                    id: 'name',
+                    header: ['Studio Name', {content: 'textFilter'}],
+                    sort: 'string',
+                    fillspace: true
+                },
+                {
+                    id: 'address',
+                    header: ['Address', {content: 'textFilter'}],
+                    sort: 'string',
+                    fillspace: true
+                },
+                {
+                    id: 'staff_count',
+                    header: ['Staff Count', {content: 'textFilter'}],
+                    sort: 'int',
+                    width: 200
+                }
+            ],
+            on: {
+                onBeforeLoad() {
+                    this.showOverlay('Loading...');
+                },
+                onAfterLoad() {
+                    this.hideOverlay();
+                }
+            },
+            ready() {
+                if (!this.count()) { // if no data is available
+                    webix.extend(this, webix.OverlayBox);
+                    this.showOverlay("<div style='...'>There is no data</div>");
+                }
+            }
+        };
+
         return {
             rows: [
                 {
@@ -12,7 +54,7 @@ export default class Locations extends JetView {
                         {},
                         {
                             margin: 20,
-                            id: 'addNewEntryButton',
+                            id: 'addNewEntryBtn',
                             view: 'button',
                             type: 'iconButton',
                             icon: 'plus',
@@ -22,47 +64,7 @@ export default class Locations extends JetView {
                         }
                     ]
                 },
-                {
-                    view: 'datatable',
-                    id: 'locationsDt',
-                    editable: true,
-                    editaction: 'dblclick',
-                    select: 'row',
-                    columns: [
-                        {
-                            id: 'name',
-                            header: ['Studio Name', {content: 'textFilter'}],
-                            sort: 'string',
-                            fillspace: true
-                        },
-                        {
-                            id: 'address',
-                            header: ['Address', {content: 'textFilter'}],
-                            sort: 'string',
-                            fillspace: true
-                        },
-                        {
-                            id: 'staff_count',
-                            header: ['Staff Count', {content: 'textFilter'}],
-                            sort: 'int',
-                            width: 200
-                        }
-                    ],
-                    on: {
-                        onBeforeLoad() {
-                            this.showOverlay('Loading...');
-                        },
-                        onAfterLoad() {
-                            this.hideOverlay();
-                        }
-                    },
-                    ready() {
-                        if (!this.count()) { // if no data is available
-                            webix.extend(this, webix.OverlayBox);
-                            this.showOverlay("<div style='...'>There is no data</div>");
-                        }
-                    }
-                }
+                datatable
             ]
         };
     }
@@ -73,29 +75,26 @@ export default class Locations extends JetView {
         let modal =  $$('studioPropsModal');
         let form = $$('studioPropsForm');
         let saveBtn = $$('saveEntryBtn');
-        let modalButtons =  $$('modalButtons');
-        let deleteButton = $$('deleteButton');
-
-        form.bind(datatable);
+        let deleteBtn = $$('deleteBtn');
+        let confirmDeleteModal = this.ui(ConfirmDeleteModal);
 
         // get and parse initial data
-        getLocations().then(function (result) {
+        getLocations().then((result) => {
             datatable.parse(result.json(), 'json');
-        }).fail(function (err) {
+        }).fail((err) => {
             throw new Error(err);
         });
 
         // add new datatable row
-        $$('addNewEntryButton').attachEvent('onItemClick', (id, e) => {
-
-            $$('preDeleteBtn').hide();
+        $$('addNewEntryBtn').attachEvent('onItemClick', (id, e) => {
+            $$('deleteBtn').hide();
             form.clear();
             modal.show();
 
             onSaveEventId && saveBtn.detachEvent(onSaveEventId);
-
             onSaveEventId = saveBtn.attachEvent('onItemClick', () => {
                 let formData = form.getValues();
+               
                 addLocation(formData).then((data) => {
                     datatable.add(data.json());
                 }).fail((err) => {
@@ -105,35 +104,35 @@ export default class Locations extends JetView {
             });
         });
 
-        // edit existing datatable row
+        // edit datatable row handler
         datatable.attachEvent('onItemDblClick', (data) => {
             data = datatable.getItem(data.row);
             modal.show();
-            $$('preDeleteBtn').show();
-            onSaveEventId && saveBtn.detachEvent(onSaveEventId);
+            form.setValues(data);
+            $$('deleteBtn').show();
 
+            onSaveEventId && saveBtn.detachEvent(onSaveEventId);
             onSaveEventId = saveBtn.attachEvent('onItemClick', () => {
                 let formData = form.getValues();
 
-                form.save();
+                datatable.updateItem(formData.id, formData);
                 editLocation(formData);
                 modal.hide();
             });
         });
 
-        deleteButton.attachEvent('onItemClick', () => {
+        deleteBtn.attachEvent('onItemClick', () => {
+            confirmDeleteModal.show();
+        });
+
+        this.app.attachEvent('confirm:delete', () => {
             let formData = form.getValues();
             datatable.remove(formData.id);
             deleteLocation(formData);
             modal.hide();
-            confirmDeleteModal.hide();
         });
-
-        this.app.attachEvent("confirm:delete", function(){
-            alert('!!!!');
-        });   
     }
-};
+}
 
 /**
  * Modal
@@ -164,7 +163,7 @@ webix.ui({
                     {
                         view: 'button',
                         value: 'Delete',
-                        id: 'preDeleteBtn',
+                        id: 'deleteBtn',
                         width: 100,
                         css: 'btn-danger',
                         click: `$$('confirmDeleteModal').show()`

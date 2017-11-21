@@ -30,7 +30,8 @@ export default class ConfirmDeleteModal extends JetView {
 
     init() {
         $$('deleteButton').attachEvent('onItemClick', () => {
-            this.app.callEvent("confirm:delete");    
+            this._root.hide();
+            this.app.callEvent('confirm:delete');
         });
     }
 }

@@ -39,16 +39,19 @@ module.exports = function (app) {
     app.post('/add_new_location', (req, res) => {
         let data = req.body;
         db.query(`INSERT INTO studios (id, name, address)
-        VALUES ('${data.id = uniqid()}', '${data.name}', '${data.address}')`, (err, rows, fields) => {
-                if (err) res.status(500).send({ error: err.message });
-                data.staff_count = 0;
-                res.send(data);
-            });
+        VALUES ('${data.id = uniqid()}', '${data.name}', '${data.address}')`,
+        (err, rows, fields) => {
+            if (err) res.status(500).send({ error: err.message });
+            data.staff_count = 0;
+            res.send(data);
+        });
     });
 
     app.post('/edit_location', (req, res) => {
         let data = req.body;
-        db.query(`UPDATE studios SET name = '${data.name}', address = '${data.address}', staff_count = ${data.staff_count} WHERE id='${data.id}'`, (err, rows, fields) => {
+        db.query(`UPDATE studios 
+        SET name = '${data.name}', address = '${data.address}' WHERE id='${data.id}'`,
+        (err, rows, fields) => {
             if (err) res.status(500).send({ error: err.message });
             res.status(200).send();
         });
@@ -224,9 +227,22 @@ module.exports = function (app) {
         // set limit
         queryCode += `
         LIMIT 
-            ${data.rows ? data.rows : 0}, 40;`;
+            ${data.rows ? data.rows : 0}, 20;`;
 
 
+        db.query(queryCode, (err, rows) => {
+            if (err) res.status(500).send({ error: err.message });
+            res.status(200).send(rows);
+        });
+    });
+
+    app.get('/get_studios', (req, res) => {
+        let queryCode = `
+        SELECT 
+            id, name AS value
+        FROM
+            studios
+        `;
         db.query(queryCode, (err, rows) => {
             if (err) res.status(500).send({ error: err.message });
             res.status(200).send(rows);
