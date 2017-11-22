@@ -190,7 +190,7 @@ module.exports = function (app) {
             queryCode += `WHERE`;
             flterKeys.forEach((key, index) => {
                 switch (key) {
-                    case 'studio_name':
+                    case 'studio_id':
                         queryCode += ` studios.name LIKE '%${data.filter[key]}%'`;
                         break;
 

@@ -1,6 +1,6 @@
 let express = require('express');
-let queries = require('./js/queries');
-let pages = require('./js/pages');
+let queries = require('./app/queries');
+let pages = require('./app/pages');
 
 let app = express();
 
