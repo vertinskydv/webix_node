@@ -1,12 +1,22 @@
 import {JetView} from 'webix-jet';
 
 export default class Equipment extends JetView {
-    confog() {
+    config() {
         return {
-            view: 'button'
-        }
+            minHeight: 500,
+            cols: [
+                {
+                    view: 'list',
+                    
+                },
+                {
+                    view: 'datatable'
+                }
+            ]
+        };
     }
-    init() {
 
+    init() {
+        alert('eqp');
     }
 }

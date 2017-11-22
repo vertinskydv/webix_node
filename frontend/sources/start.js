@@ -7,8 +7,7 @@ webix.ready(() => {
     });
     app.render();
 
-    app.attachEvent('app:error:resolve', function (name, error) {
-        debugger;
+    app.attachEvent('app:error:resolve', (name, error) => {
         window.console.error(error);
     });
 });
