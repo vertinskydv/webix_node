@@ -25,7 +25,7 @@ export default class Staff extends JetView {
                     sort: 'server',
                     fillspace: true,
                     editor: 'select',
-                    options: POSITIONS
+                    options: '/get_positions'
                 },
                 {
                     id: 'rate',
@@ -36,7 +36,7 @@ export default class Staff extends JetView {
                     options: RATE
                 },
                 {
-                    id: 'studio_name',
+                    id: 'studio_id',
                     header: ['Studio', { content: 'serverFilter' }],
                     sort: 'server',
                     fillspace: true,
@@ -59,7 +59,10 @@ export default class Staff extends JetView {
                 }
             },
             editable: true,
-            url: '/staff'
+            url: '/staff',
+            save: {
+                update: '/update_employee'
+            }
         };
 
         return {
@@ -100,8 +103,6 @@ export default class Staff extends JetView {
         this.removeEmployeeBtn = $$('removeEmployeeButton');
         let datatable = this.datatable = $$('staffDt');
         let sortInfo =this.sortInfo = {};
-        debugger;
-
 
         webix.extend(datatable, webix.ProgressBar);
 
@@ -174,6 +175,10 @@ export default class Staff extends JetView {
             datatable.remove(selectedId);
             $$('confirmDeleteModal').hide();
         });
+
+        datatable.attachEvent('onAfterSave', (a, b, c ) => {
+            debugger;
+        })
     }
 
     initializeModal(data) {
@@ -196,14 +201,14 @@ export default class Staff extends JetView {
                         name: 'position',
                         id: 'modalStaffPosition',
                         labelWidth: 150,
-                        options: data.positions
+                        options: '/get_positions'
                     },
                     {
                         view: 'select',
                         label: 'Studio',
                         name: 'studio_id',
                         labelWidth: 150,
-                        options: data.studios
+                        options: '/get_studios'
                     },
                     {
                         view: 'select',

@@ -16,6 +16,15 @@ module.exports = function (app) {
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(bodyParser.json());
 
+    let dbQuery = function(queryCode) {
+        return new Promise((resolve, reject) => {
+            db.query(queryCode, (err, data) => {
+                if (err) reject(err);
+                resolve(data);
+            });
+        });
+    };
+
     // Locations page queries
     // ============================================
     app.post('/locations', (req, res) => {
@@ -40,21 +49,21 @@ module.exports = function (app) {
         let data = req.body;
         db.query(`INSERT INTO studios (id, name, address)
         VALUES ('${data.id = uniqid()}', '${data.name}', '${data.address}')`,
-        (err, rows, fields) => {
-            if (err) res.status(500).send({ error: err.message });
-            data.staff_count = 0;
-            res.send(data);
-        });
+            (err, rows, fields) => {
+                if (err) res.status(500).send({ error: err.message });
+                data.staff_count = 0;
+                res.send(data);
+            });
     });
 
     app.post('/edit_location', (req, res) => {
         let data = req.body;
         db.query(`UPDATE studios 
         SET name = '${data.name}', address = '${data.address}' WHERE id='${data.id}'`,
-        (err, rows, fields) => {
-            if (err) res.status(500).send({ error: err.message });
-            res.status(200).send();
-        });
+            (err, rows, fields) => {
+                if (err) res.status(500).send({ error: err.message });
+                res.status(200).send();
+            });
     });
 
     app.post('/delete_location', (req, res) => {
@@ -110,9 +119,9 @@ module.exports = function (app) {
                 staff (id, name, position, rate, studio_id)
             VALUES 
                 ('${currentEmployeeId}', '${data.name}', '${data.position}', '${data.rate}', '${data.studio_id}')`,
-        (err, rows, fields) => {
-            if (err) res.status(500).send({ error: err.message });
-        });
+            (err, rows, fields) => {
+                if (err) res.status(500).send({ error: err.message });
+            });
 
         db.query(`
             SELECT 
@@ -163,7 +172,7 @@ module.exports = function (app) {
 
         let queryCode = `
         SELECT 
-            staff.id, staff.name, staff.rate, staff.position, studios.name AS studio_name
+            staff.id, staff.name, staff.rate, staff.position, studios.id AS studio_id
         FROM 
             staff 
         LEFT JOIN 
@@ -211,7 +220,7 @@ module.exports = function (app) {
                 case 'rate':
                     queryCode += ` ORDER BY staff.rate`;
                     break;
-                case 'studio_name':
+                case 'studio_id':
                     queryCode += ` ORDER BY studios.name`;
                     break;
                 default:
@@ -227,7 +236,7 @@ module.exports = function (app) {
         // set limit
         queryCode += `
         LIMIT 
-            ${data.rows ? data.rows : 0}, 20;`;
+            ${data.rows ? data.rows : 0}, 25;`;
 
 
         db.query(queryCode, (err, rows) => {
@@ -244,9 +253,133 @@ module.exports = function (app) {
             studios
         `;
         db.query(queryCode, (err, rows) => {
+            if (err) res.status(500).send(err);
+            res.status(200).send(rows);
+        });
+    });
+
+    app.get('/get_positions', (req, res) => {
+        let queryCode = `
+        SELECT 
+            id, value
+        FROM
+            positions
+        `;
+        db.query(queryCode, (err, rows) => {
             if (err) res.status(500).send({ error: err.message });
             res.status(200).send(rows);
         });
+    });
+
+    app.post('/update_employee', (req, res) => {
+        let data = req.body;
+        let getOldStudioIdCode = `
+            SELECT
+                studio_id
+            FROM 
+                staff
+            WHERE
+                id = '${data.id}'`;
+        let updateStudioIdCode = `
+            UPDATE 
+                staff
+            SET 
+                name = '${data.name}', position = '${data.position}', rate = ${data.rate}, studio_id = '${data.studio_id}'
+            WHERE 
+                id='${data.id}'`;
+        dbQuery(getOldStudioIdCode).then((dataId) => {
+            let oldStudioId = dataId[0].studio_id;
+
+            if (oldStudioId !== data.studio_id) {
+                updateStudioStaff(oldStudioId, data.studio_id, data.id);
+            }
+            return dbQuery(updateStudioIdCode);
+        }).then(() => {
+            res.status(200).send();
+        }).catch((err) => {
+            res.status(500).send(err);
+        });
+
+        async function updateStudioStaff(oldStudioId, newStudioId, employeeId) {
+            let getOldStudioStaff = `
+            SELECT 
+                staff_id
+            FROM  
+                studios
+            WHERE 
+                id='${oldStudioId}'`;
+            let getNewStudioStaff = `
+            SELECT 
+                staff_id
+            FROM  
+                studios
+            WHERE 
+                id='${newStudioId}'`;
+
+            let oldStudioStaff;
+            let newStudioStaff;
+
+            try {
+                oldStudioStaff = await dbQuery(getOldStudioStaff);
+                newStudioStaff = await dbQuery(getNewStudioStaff);
+            } catch (err) {
+                throw Error(err);
+            }
+
+            let updateOldStudioStaff;
+            let updateNewStudioStaff;
+            try {
+                oldStudioStaff = JSON.parse(oldStudioStaff[0].staff_id);
+            } catch (err) {
+                oldStudioStaff = undefined;
+            }
+
+            try {
+                newStudioStaff = JSON.parse(newStudioStaff[0].staff_id);
+                if (!newStudioStaff) {
+                    newStudioStaff = [];
+                }
+            } catch (err) {
+                newStudioStaff = [];
+            }
+
+
+            if (oldStudioStaff) {
+                oldStudioStaff.splice(oldStudioStaff.indexOf(employeeId), 1);
+                updateOldStudioStaff = `
+                UPDATE
+                    studios
+                SET
+                    staff_id='${JSON.stringify(oldStudioStaff)}'
+                WHERE
+                    id='${oldStudioId}'
+                `;
+                try {
+                    await dbQuery(updateOldStudioStaff);
+                } catch (err) {
+                    throw Error(err);
+                }
+            }
+
+
+            (newStudioStaff.indexOf(employeeId) === -1) && newStudioStaff.push(employeeId);
+
+            updateNewStudioStaff = `
+            UPDATE
+                studios
+            SET
+                staff_id='${JSON.stringify(newStudioStaff)}'
+            WHERE
+                id='${newStudioId}'
+            `;
+
+            try {
+                await dbQuery(updateNewStudioStaff);
+            } catch (err) {
+                throw Error(err);
+            }
+
+        }
     });
     // ============================================
     // End Staff page queries
@@ -275,7 +408,7 @@ function removeEmptyProps(parObj, objKey) {
         }
     }
 
-    if  (Object.keys(obj).length === 0) {
+    if (Object.keys(obj).length === 0) {
         delete parObj[objKey];
     }
 }
