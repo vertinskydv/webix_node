@@ -107,21 +107,16 @@ export default class Staff extends JetView {
 
         webix.extend(datatable, webix.ProgressBar);
 
+        this.initializeModal();
+
         // get datatable sort info
         this.datatable.attachEvent('onBeforeSort', (by, dir) => {
             this.sortInfo[by] = dir;
         });
 
         /**
-         * get form data and init Add New Employee form
-         */
-        getStaffModalFormContent().then((data) => {
-            this.initializeModal(data.json());
-        });
-
-        /**
          * on Datatable scroll handler
-         * If the table is scrolled to the bottom - 
+         * If the table is scrolled to the bottom
          */
         datatable.attachEvent('onScrollY', () => {
             let rowsCount = datatable.count();
@@ -171,11 +166,7 @@ export default class Staff extends JetView {
         });
     }
 
-    confirmDelete() {
-        debugger;
-    }
-
-    initializeModal(data) {
+    initializeModal() {
         webix.ui({
             view: 'window',
             id: 'staffPropsModal',

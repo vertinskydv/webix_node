@@ -16,10 +16,6 @@ export function deleteLocation(data) {
     return webix.ajax().post(URL.delete_location, data);
 }
 
-export function getStaffModalFormContent() {
-    return webix.ajax().post(URL.get_staff_modal_form);
-}
-
 export function getStaff(data) {
     return webix.ajax().get(URL.get_staff, data);
 }
