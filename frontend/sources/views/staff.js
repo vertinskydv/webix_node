@@ -2,6 +2,7 @@ import { JetView } from 'webix-jet';
 import { getStaffModalFormContent, addNewEmployee, getStaff, removeEmployee } from '../models/queries';
 import ConfirmDeleteModal from './confirm-delete-modal';
 import RATE from '../models/staff/rate';
+import URLS from '../models/urls';
 
 export default class Staff extends JetView {
     config() {
@@ -24,7 +25,7 @@ export default class Staff extends JetView {
                     sort: 'server',
                     fillspace: true,
                     editor: 'select',
-                    options: '/get_positions'
+                    options: URLS.get_positions
                 },
                 {
                     id: 'rate',
@@ -40,7 +41,7 @@ export default class Staff extends JetView {
                     sort: 'server',
                     fillspace: true,
                     editor: 'combo',
-                    options: '/get_studios'
+                    options: URLS.get_studios
                 }
             ],
             on: {
@@ -58,9 +59,9 @@ export default class Staff extends JetView {
                 }
             },
             editable: true,
-            url: '/staff',
+            url: URLS.get_staff,
             save: {
-                update: '/update_employee'
+                update: URLS.update_employee
             }
         };
 
@@ -157,36 +158,17 @@ export default class Staff extends JetView {
         });
 
         this.removeEmployeeBtn.attachEvent('onItemClick', () => {
-            console.log(this.app);
             this.confirmDeleteModal.getRoot().show();
-            debugger;
         });
 
         this.app.attachEvent('confirm:delete', () => {
             let selectedInfo = datatable.getSelectedId();
-            debugger;
-
             if (!selectedInfo.id) {
                 return;
             }
             removeEmployee(selectedInfo);
+            datatable.remove(selectedInfo.id);
         });
-
-        // $$('deleteButton').attachEvent('onItemClick', () => {
-        //     debugger;
-        //     let selectedInfo = datatable.getSelectedId();
-        //     let selectedId;
-        //     // debugger;
-        //     if (!selectedInfo) {
-        //         return;
-        //     }
-
-        //     selectedId = selectedInfo.id;
-        //     removeEmployee({id: selectedId});
-        //     datatable.remove(selectedId);
-        //     $$('confirmDeleteModal').hide();
-        // });
-
     }
 
     confirmDelete() {
@@ -213,14 +195,14 @@ export default class Staff extends JetView {
                         name: 'position',
                         id: 'modalStaffPosition',
                         labelWidth: 150,
-                        options: '/get_positions'
+                        options: URLS.get_positions
                     },
                     {
                         view: 'select',
                         label: 'Studio',
                         name: 'studio_id',
                         labelWidth: 150,
-                        options: '/get_studios'
+                        options: URLS.get_studios
                     },
                     {
                         view: 'select',

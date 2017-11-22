@@ -1,7 +1,6 @@
 import { JetView } from 'webix-jet';
 
 export default class ConfirmDeleteModal extends JetView {
-
     config() {
         return {
             view: 'window',
