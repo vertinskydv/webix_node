@@ -1,7 +1,6 @@
 import { JetView } from 'webix-jet';
 import { getStaffModalFormContent, addNewEmployee, getStaff, removeEmployee } from '../models/queries';
-import '../models/confirm-delete-modal';
-import POSITIONS from '../models/staff/positions';
+import ConfirmDeleteModal from './confirm-delete-modal';
 import RATE from '../models/staff/rate';
 
 export default class Staff extends JetView {
@@ -103,6 +102,7 @@ export default class Staff extends JetView {
         this.removeEmployeeBtn = $$('removeEmployeeButton');
         let datatable = this.datatable = $$('staffDt');
         let sortInfo =this.sortInfo = {};
+        this.confirmDeleteModal = this.ui(ConfirmDeleteModal); 
 
         webix.extend(datatable, webix.ProgressBar);
 
@@ -158,27 +158,39 @@ export default class Staff extends JetView {
 
         this.removeEmployeeBtn.attachEvent('onItemClick', () => {
             console.log(this.app);
-
+            this.confirmDeleteModal.getRoot().show();
+            debugger;
         });
 
-        $$('deleteButton').attachEvent('onItemClick', () => {
-            debugger;
+        this.app.attachEvent('confirm:delete', () => {
             let selectedInfo = datatable.getSelectedId();
-            let selectedId;
-            // debugger;
-            if (!selectedInfo) {
+            debugger;
+
+            if (!selectedInfo.id) {
                 return;
             }
-
-            selectedId = selectedInfo.id;
-            removeEmployee({id: selectedId});
-            datatable.remove(selectedId);
-            $$('confirmDeleteModal').hide();
+            removeEmployee(selectedInfo);
         });
 
-        datatable.attachEvent('onAfterSave', (a, b, c ) => {
-            debugger;
-        })
+        // $$('deleteButton').attachEvent('onItemClick', () => {
+        //     debugger;
+        //     let selectedInfo = datatable.getSelectedId();
+        //     let selectedId;
+        //     // debugger;
+        //     if (!selectedInfo) {
+        //         return;
+        //     }
+
+        //     selectedId = selectedInfo.id;
+        //     removeEmployee({id: selectedId});
+        //     datatable.remove(selectedId);
+        //     $$('confirmDeleteModal').hide();
+        // });
+
+    }
+
+    confirmDelete() {
+        debugger;
     }
 
     initializeModal(data) {

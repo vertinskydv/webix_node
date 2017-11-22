@@ -122,7 +122,7 @@ export default class Locations extends JetView {
         });
 
         deleteBtn.attachEvent('onItemClick', () => {
-            confirmDeleteModal.show();
+            confirmDeleteModal.getRoot().show();
         });
 
         this.app.attachEvent('confirm:delete', () => {

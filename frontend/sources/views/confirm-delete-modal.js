@@ -1,6 +1,7 @@
-import {JetView} from 'webix-jet';
+import { JetView } from 'webix-jet';
 
 export default class ConfirmDeleteModal extends JetView {
+
     config() {
         return {
             view: 'window',
@@ -15,23 +16,21 @@ export default class ConfirmDeleteModal extends JetView {
                     {
                         view: 'button',
                         value: 'No',
-                        click: "$$('confirmDeleteModal').hide()"
+                        click: `$$('confirmDeleteModal').hide()`
                     },
                     {
                         view: 'button',
                         id: 'deleteButton',
                         value: 'Delete',
-                        css: 'btn-danger'
+                        css: 'btn-danger',
+                        click: () => {
+                            this.app.callEvent('confirm:delete');
+                            $$('confirmDeleteModal').hide();
+                        }
                     }
                 ]
             }
         };
     }
-
-    init() {
-        $$('deleteButton').attachEvent('onItemClick', () => {
-            this._root.hide();
-            this.app.callEvent('confirm:delete');
-        });
-    }
 }
+
