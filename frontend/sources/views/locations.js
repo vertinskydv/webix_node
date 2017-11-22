@@ -131,6 +131,19 @@ export default class Locations extends JetView {
             deleteLocation(formData);
             modal.hide();
         });
+
+        this.app.attachEvent('refresh:datatable', () => {
+            datatable.clearAll();
+            getLocations().then((data) => {
+                datatable.parse(data.json(), 'json');
+            }).catch((error) => {
+                throw new Error(error);
+            });
+        });
+
+        this.app.attachEvent('export:datatable', () => {
+            webix.toExcel(datatable);
+        });
     }
 }
 

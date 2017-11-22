@@ -8,6 +8,7 @@ webix.ready(() => {
     app.render();
 
     app.attachEvent('app:error:resolve', function (name, error) {
+        debugger;
         window.console.error(error);
     });
 });

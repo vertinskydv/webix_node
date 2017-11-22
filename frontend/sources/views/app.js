@@ -1,5 +1,4 @@
 import {JetView, plugins} from 'webix-jet';
-import {getLocations} from '../models/queries';
 
 export default class ToolBar extends JetView {
     config() {
@@ -26,21 +25,13 @@ export default class ToolBar extends JetView {
 
     init() {
         // refresh button handler
-        $$('refreshBtn').attachEvent('onItemClick', function (id, e) {
-            let datatable = $$('locationsDt');
-
-            datatable.clearAll();
-            getLocations().then((data) => {
-                datatable.parse(data.json(), 'json');
-            }).fail((error) => {
-                throw new Error(error);
-            });
+        $$('refreshBtn').attachEvent('onItemClick', (id, e) => {
+            this.app.callEvent('refresh:datatable');
         });
 
         // export to excel button handler
         $$('exportToExcelBtn').attachEvent('onItemClick', () => {
-            let datatable = $$('locationsDt');
-            webix.toExcel(datatable);
+            this.app.callEvent('export:datatable');
         });
 
         this.use(plugins.Menu, 'app:nav');
