@@ -1,5 +1,5 @@
 import { JetView } from 'webix-jet';
-import { getStaffModalFormContent, addNewEmployee, getStaff, removeEmployee } from '../models/queries';
+import { addNewEmployee, getStaff, removeEmployee } from '../models/queries';
 import ConfirmDeleteModal from './confirm-delete-modal';
 import RATE from '../models/staff/rate';
 import URLS from '../models/urls';

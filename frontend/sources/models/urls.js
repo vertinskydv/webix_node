@@ -8,5 +8,6 @@ export default {
     remove_employee: '/remove_employee',
     get_positions: '/get_positions',
     get_studios: '/get_studios',
-    update_employee: '/update_employee'
+    update_employee: '/update_employee',
+    add_equipment: '/add_equipment'
 }

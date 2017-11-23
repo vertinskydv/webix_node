@@ -1,8 +1,19 @@
 let mysql = require('mysql');
 let bodyParser = require('body-parser');
 let uniqid = require('uniqid');
+let multer = require('multer');
 
 let jsonParser = bodyParser.json();
+
+let storage = multer.diskStorage({
+    destination: 'uploads/',
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname)
+    }
+});
+
+let upload = multer({ storage: storage });
+// let upload = multer({ dest: 'uploads/' });
 
 const db = mysql.createConnection({
     host: 'localhost',
@@ -15,6 +26,8 @@ db.connect();
 module.exports = function (app) {
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(bodyParser.json());
+
+    // app.use(upload.all());
 
     let dbQuery = function(queryCode) {
         return new Promise((resolve, reject) => {
@@ -49,21 +62,21 @@ module.exports = function (app) {
         let data = req.body;
         db.query(`INSERT INTO studios (id, name, address)
         VALUES ('${data.id = uniqid()}', '${data.name}', '${data.address}')`,
-            (err, rows, fields) => {
-                if (err) res.status(500).send({ error: err.message });
-                data.staff_count = 0;
-                res.send(data);
-            });
+        (err, rows, fields) => {
+            if (err) res.status(500).send({ error: err.message });
+            data.staff_count = 0;
+            res.send(data);
+        });
     });
 
     app.post('/edit_location', (req, res) => {
         let data = req.body;
         db.query(`UPDATE studios 
         SET name = '${data.name}', address = '${data.address}' WHERE id='${data.id}'`,
-            (err, rows, fields) => {
-                if (err) res.status(500).send({ error: err.message });
-                res.status(200).send();
-            });
+        (err, rows, fields) => {
+            if (err) res.status(500).send({ error: err.message });
+            res.status(200).send();
+        });
     });
 
     app.post('/delete_location', (req, res) => {
@@ -119,9 +132,9 @@ module.exports = function (app) {
                 staff (id, name, position, rate, studio_id)
             VALUES 
                 ('${currentEmployeeId}', '${data.name}', '${data.position}', '${data.rate}', '${data.studio_id}')`,
-            (err, rows, fields) => {
-                if (err) res.status(500).send({ error: err.message });
-            });
+        (err, rows, fields) => {
+            if (err) res.status(500).send({ error: err.message });
+        });
 
         db.query(`
             SELECT 
@@ -130,11 +143,11 @@ module.exports = function (app) {
                 studios
             WHERE 
                 id='${data.studio_id}'`,
-            (err, rows, fields) => {
-                if (err) res.status(500).send({ error: err.message });
-                data.studio_name = rows[0].studio_name;
-                res.send(data);
-            });
+        (err, rows, fields) => {
+            if (err) res.status(500).send({ error: err.message });
+            data.studio_name = rows[0].studio_name;
+            res.send(data);
+        });
 
         db.query(`SELECT staff_id FROM studios WHERE id='${data.studio_id}'`, (err, rows, fields) => {
             if (err) res.status(500).send({ error: err.message });
@@ -159,9 +172,9 @@ module.exports = function (app) {
         console.log(id);
         db.query(`
             DELETE FROM staff WHERE id = '${id}'`,
-            (err, rows) => {
-                if (err) res.status(500).send({ error: err.message });
-            });
+        (err, rows) => {
+            if (err) res.status(500).send({ error: err.message });
+        });
     });
 
     app.get('/staff', (req, res) => {
@@ -383,6 +396,17 @@ module.exports = function (app) {
     });
     // ============================================
     // End Staff page queries
+
+    app.post('/upload_image', upload.any(), (req, res) => {
+        let imageData;
+        if (req.files) {
+            imageData = req.files[0];
+        }
+        debugger;
+        res.status(200).send({
+            img_url: imageData.destination + imageData.filename,
+        });
+    });
 };
 
 // helper functions
