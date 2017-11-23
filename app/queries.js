@@ -399,13 +399,23 @@ module.exports = function (app) {
 
     app.post('/upload_image', upload.any(), (req, res) => {
         let imageData;
+        let response;
         if (req.files) {
             imageData = req.files[0];
         }
+
+        if (imageData) {
+            res.status(200).send({
+                img_url: imageData.destination + imageData.filename
+            });
+        } else {
+            res.status(500).send();
+        }
+    });
+
+    app.post('/add_equipment', (req, res) => {
+        let data = req.body;
         debugger;
-        res.status(200).send({
-            img_url: imageData.destination + imageData.filename,
-        });
     });
 };
 

@@ -1,5 +1,7 @@
 import {JetView} from 'webix-jet';
 
+import {addEquipment} from '../models/queries';
+
 import URLS from '../models/urls';
 
 export default class Equipment extends JetView {
@@ -56,7 +58,9 @@ export default class Equipment extends JetView {
 
         saveEquipmentBtn.attachEvent('onItemClick', () => {
             $$('imageUpload').send((response) => {
-                debugger;
+                let formData = addEquipmentForm.getValues();
+                formData.img_url = response.img_url;
+                addEquipment(formData);
             });
         });
     }
@@ -97,7 +101,7 @@ webix.ui({
             {
                 view: 'select',
                 label: 'Studio',
-                name: 'studio',
+                name: 'studio_id',
                 labelWidth: 150,
                 labelPosition: 'left',
                 options: URLS.get_studios
@@ -106,7 +110,6 @@ webix.ui({
                 view: 'uploader',
                 id: 'imageUpload',
                 label: 'Photo',
-                name: 'photo',
                 link: 'mylist',
                 autosend: false,
                 upload: '/upload_image',
