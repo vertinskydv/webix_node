@@ -76,21 +76,9 @@ let leftMenuUiData = [
         value: 'Equipment'
     },
     {
-        id: 'calendar',
-        icon: 'calendar',
-        value: 'Calendar',
-        data: [
-            {
-                id: 'rental_schedule',
-                icon: 'clock-o',
-                value: 'Rental schedule'
-            },
-            {
-                id: 'staff_work_schedule',
-                icon: 'address-card-o',
-                value: 'Staff work schedule'
-            }
-        ]
+        id: 'settings',
+        icon: 'cog',
+        value: 'Settings'
     }
 ];
 

@@ -111,7 +111,7 @@ export default class Equipment extends JetView {
 
     init() {
         let addEquipmentButton = this.addEquipmentButton = $$('addEquipmentButton');
-        let addEquipmentModal = this.addEquipmentModal = $$('addEquipmentModal');
+        let addEquipmentModal = this.addEquipmentModal = this.ui(modal);
         let addEquipmentForm = this.addEquipmentForm = $$('addEquipmentForm');
         let saveEquipmentBtn = this.saveEquipmentBtn = $$('saveEquipmentBtn');
         let imageUploader = this.imageUploader = $$('imageUpload');
@@ -187,7 +187,7 @@ export default class Equipment extends JetView {
 /**
  * Modal
  */
-webix.ui({
+let modal = {
     view: 'window',
     id: 'addEquipmentModal',
     head: 'Add New Equipment',
@@ -226,14 +226,25 @@ webix.ui({
                 link: 'mylist',
                 autosend: false,
                 upload: '/upload_image',
-                multiple: false
+                multiple: false,
+                on: {
+                    onBeforeFileAdd: (item) => {
+                        var type = item.type.toLowerCase();
+                        if (type !== 'jpg') {
+                            webix.message('Only JPG images!');
+                            return false;
+                        }
+                    }
+                }
+
             },
             {
                 view: 'list',
                 id: 'mylist',
                 type: 'uploader',
                 autoheight: true,
-                borderless: true
+                borderless: true,
+
             },
             {
                 margin: 20,
@@ -253,5 +264,5 @@ webix.ui({
             }
         ]
     }
-});
+};
 
