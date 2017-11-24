@@ -22,3 +22,8 @@
 .btn-danger button:active {
     background-color: #B10000;
 }
+
+.main-header {
+    margin: 0;
+    font-size: 25px;
+}

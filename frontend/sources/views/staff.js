@@ -69,7 +69,11 @@ export default class Staff extends JetView {
             rows: [
                 {
                     cols: [
-                        {},
+                        {
+                            template: () => {
+                                return '<h1 class="main-header">Staff</h6>';
+                            }
+                        },
                         {
                             margin: 20,
                             id: 'removeEmployeeButton',

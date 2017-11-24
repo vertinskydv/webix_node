@@ -13,7 +13,11 @@ export default class Equipment extends JetView {
             rows: [
                 {
                     cols: [
-                        {},
+                        {
+                            template: () => {
+                                return '<h1 class="main-header">Equipment</h1>';
+                            }
+                        },
                         {
                             margin: 20,
                             id: 'addEquipmentButton',
@@ -22,12 +26,12 @@ export default class Equipment extends JetView {
                             icon: 'plus',
                             label: 'Add Equipment',
                             align: 'right',
+                            height: 40,
                             autowidth: true
                         }
                     ]
                 },
                 {
-                    minHeight: 500,
                     cols: [
                         {
                             view: 'list',
@@ -42,6 +46,7 @@ export default class Equipment extends JetView {
                             gravity: 0.5,
                             select: true,
                             editable: true,
+                            editaction: 'dblclick',
                             columns: [
                                 {
                                     id: 'name',
@@ -95,7 +100,7 @@ export default class Equipment extends JetView {
                                 }
                                 return '';
                             },
-                            id: 'infoBlock',
+                            id: 'viewImageBlock',
                             gravity: 0.3
                         }
                     ]
@@ -112,6 +117,8 @@ export default class Equipment extends JetView {
         let imageUploader = this.imageUploader = $$('imageUpload');
         let list = this.list = $$('studioList');
         let datatable = this.datatable = $$('equipmentDatatable');
+        let viewImageBlock = this.viewImageBlock = $$('viewImageBlock');
+
 
         addEquipmentButton.attachEvent('onItemClick', () => {
             addEquipmentForm.clear();
@@ -130,7 +137,7 @@ export default class Equipment extends JetView {
             }
 
             this.activeStudioId = id;
-            this.clearInfoblock();
+            this.clearViewImageBlock();
 
             getStudioEquipments({id: id}).then((data) => {
                 data = data.json();
@@ -141,7 +148,7 @@ export default class Equipment extends JetView {
 
         datatable.attachEvent('onItemClick', () => {
             let rowData = datatable.getSelectedItem();
-            this.fillInfoBlock(rowData);
+            this.fillViewImageBlock(rowData);
         });
 
         saveEquipmentBtn.attachEvent('onItemClick', () => {
@@ -168,12 +175,12 @@ export default class Equipment extends JetView {
         }
     }
 
-    fillInfoBlock(data) {
-        this.infoBlock.parse(data);
+    fillViewImageBlock(data) {
+        this.viewImageBlock.parse(data);
     }
 
-    clearInfoblock() {
-        this.infoBlock.parse([]);
+    clearViewImageBlock() {
+        this.viewImageBlock.parse([]);
     }
 }
 

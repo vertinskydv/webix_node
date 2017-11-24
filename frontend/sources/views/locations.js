@@ -51,7 +51,11 @@ export default class Locations extends JetView {
             rows: [
                 {
                     cols: [
-                        {},
+                        {
+                            template: () => {
+                                return '<h1 class="main-header">Locations</h1>';
+                            }
+                        },
                         {
                             margin: 20,
                             id: 'addNewEntryBtn',
