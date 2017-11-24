@@ -446,6 +446,8 @@ module.exports = function (app) {
             res.status(500).send(err);
         });
     });
+    // ============================================
+    // end Equipment page queries
 };
 
 // helper functions

@@ -147,6 +147,7 @@ export default class Equipment extends JetView {
                     data = data.json();
                     if (data.studio_id === this.activeStudioId) {
                         datatable.add(data);
+                        this.datatable.hideOverlay();
                     }
                 });
                 addEquipmentModal.hide();
@@ -157,8 +158,8 @@ export default class Equipment extends JetView {
     fillDatatable(data) {
         this.datatable.hideOverlay();
         this.datatable.parse(data);
-        if (!this.datatable.count()) { // if no data is available
-            this.datatable.showOverlay("<div style='...'>There is no data</div>");
+        if (!this.datatable.count()) {
+            this.datatable.showOverlay('<div>There is no data</div>');
         }
     }
 
