@@ -9,5 +9,6 @@ export default {
     get_positions: '/get_positions',
     get_studios: '/get_studios',
     update_employee: '/update_employee',
-    add_equipment: '/add_equipment'
+    add_equipment: '/add_equipment',
+    get_studio_equipments: '/get_studio_equipments'
 }

@@ -5,6 +5,7 @@ let pages = require('./app/pages');
 let app = express();
 
 app.use(express.static('frontend'));
+app.use(express.static('uploads'));
 pages(app);
 queries(app);
 

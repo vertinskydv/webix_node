@@ -46,7 +46,7 @@ let mainToolbar = {
         {
             view: 'label',
             css: 'logo',
-            label: '<span class="logo"><span class="logo__name">Book a studio</span> owner app</span>'
+            label: '<span class="logo"><span class="logo__name">My studios</span> owner app</span>'
         },
         {
             id: 'toolbarButtons',

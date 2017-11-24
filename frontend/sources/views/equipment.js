@@ -1,6 +1,6 @@
 import {JetView} from 'webix-jet';
 
-import {addEquipment} from '../models/queries';
+import {addEquipment, getStudioEquipments} from '../models/queries';
 
 import URLS from '../models/urls';
 
@@ -26,18 +26,69 @@ export default class Equipment extends JetView {
                 },
                 {
                     minHeight: 500,
-                    type: 'head',
                     cols: [
                         {
                             view: 'list',
-                            gravity: 0.2
+                            id: 'studioList',
+                            gravity: 0.2,
+                            template: '#value#',
+                            select: true
                         },
                         {
                             view: 'datatable',
-                            gravity: 0.5
+                            id: 'equipmentDatatable',
+                            gravity: 0.5,
+                            select: true,
+                            columns: [
+                                {
+                                    id: 'name',
+                                    header: 'Name',
+                                    fillspace: true
+                                },
+                                {
+                                    id: 'type',
+                                    header: 'Type',
+                                    fillspace: true
+                                },
+                                {
+                                    id: 'serial_number',
+                                    header: 'Serial Number',
+                                    fillspace: true
+                                },
+                                {
+                                    id: 'purchase_time',
+                                    header: 'Purchase Time',
+                                    fillspace: true
+                                },
+                                {
+                                    id: 'state',
+                                    header: 'State',
+                                    fillspace: true
+                                }
+                            ],
+                            ready() {
+                                // webix.extend(this, webix.OverlayBox);
+                                // if (!this.count()) { // if no data is available
+                                //     this.showOverlay('<div>There is no data</div>');
+                                // }
+                            }
                         },
                         {
-                            view: 'list',
+                            template: (obj) => {
+                                if (Object.keys(obj).length >0) {
+                                    return `
+                                    <div style="
+                                        width: 100%;
+                                        height: 100%;
+                                        background-size: contain;
+                                        background-image: url(${obj.img_url});
+                                        background-repeat: no-repeat;
+                                        background-position: center;
+                                    "></div>`;
+                                }
+                                return '';
+                            },
+                            id: 'infoBlock',
                             gravity: 0.3
                         }
                     ]
@@ -51,18 +102,69 @@ export default class Equipment extends JetView {
         let addEquipmentModal = this.addEquipmentModal = $$('addEquipmentModal');
         let addEquipmentForm = this.addEquipmentForm = $$('addEquipmentForm');
         let saveEquipmentBtn = this.saveEquipmentBtn = $$('saveEquipmentBtn');
+        let list = this.list = $$('studioList');
+        let datatable = this.datatable = $$('equipmentDatatable');
+        let infoBlock = this.infoBlock = $$('infoBlock');
+
 
         addEquipmentButton.attachEvent('onItemClick', () => {
             addEquipmentModal.show();
+        });
+
+        list.load(URLS.get_studios, 'json', (data) => {
+            data = JSON.parse(data);
+            list.parse(data, 'json');
+        });
+
+        list.attachEvent('onItemClick', (id) => {
+            if (!id) {
+                return;
+            }
+
+            this.activeStudioId = id;
+            this.clearInfoblock();
+
+            getStudioEquipments({id: id}).then((data) => {
+                data = data.json();
+                datatable.clearAll();
+                this.fillDatatable(data);
+            });
+        });
+
+        datatable.attachEvent('onItemClick', () => {
+            let rowData = datatable.getSelectedItem();
+            this.fillInfoBlock(rowData);
         });
 
         saveEquipmentBtn.attachEvent('onItemClick', () => {
             $$('imageUpload').send((response) => {
                 let formData = addEquipmentForm.getValues();
                 formData.img_url = response.img_url;
-                addEquipment(formData);
+                addEquipment(formData).then((data) => {
+                    data = data.json();
+                    if (data.studio_id === this.activeStudioId) {
+                        datatable.add(data);
+                    }
+                });
+                addEquipmentModal.close();
             });
         });
+    }
+
+    fillDatatable(data) {
+        this.datatable.hideOverlay();
+        this.datatable.parse(data);
+        if (!this.datatable.count()) { // if no data is available
+            this.datatable.showOverlay("<div style='...'>There is no data</div>");
+        }
+    }
+
+    fillInfoBlock(data) {
+        this.infoBlock.parse(data);
+    }
+
+    clearInfoblock() {
+        this.infoBlock.parse([]);
     }
 }
 
@@ -84,7 +186,7 @@ webix.ui({
             {view: 'text', label: 'Name', name: 'name', labelWidth: 150},
             {view: 'text', label: 'Type', name: 'type', labelWidth: 150},
             {view: 'text', label: 'Serial Number', name: 'serial_number', labelWidth: 150},
-            {view: 'datepicker', label: 'Time of purchase', name: 'purchase_time', labelWidth: 150, labelPosition: 'left'},
+            {view: 'datepicker', label: 'Time of purchase', name: 'purchase_time', labelWidth: 150, format: '%d-%m-%Y'},
             {
                 view: 'select',
                 label: 'Current state',
@@ -131,13 +233,6 @@ webix.ui({
                         value: 'Cancel',
                         click: "$$('addEquipmentModal').hide()"
                     },
-                    // {
-                    //     view: 'button',
-                    //     value: 'Delete',
-                    //     id: 'deleteBtn',
-                    //     width: 100,
-                    //     css: 'btn-danger'
-                    // },
                     {
                         view: 'button',
                         value: 'Save',

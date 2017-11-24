@@ -31,3 +31,7 @@ export function removeEmployee(data) {
 export function addEquipment(data) {
     return webix.ajax().post(URL.add_equipment, data);
 }
+
+export function getStudioEquipments(data) {
+    return webix.ajax().post(URL.get_studio_equipments, data)
+}

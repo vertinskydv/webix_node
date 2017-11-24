@@ -397,6 +397,24 @@ module.exports = function (app) {
     // ============================================
     // End Staff page queries
 
+    // Equipment page queries
+    // ============================================
+    app.post('/get_studio_equipments', (req, res) => {
+        let data = req.body;
+        let queryCode = `
+        SELECT 
+            *
+        FROM
+            equipment
+        WHERE
+            studio_id='${data.id}'
+        `;
+        db.query(queryCode, (err, rows) => {
+            if (err) res.status(500).send(err);
+            res.status(200).send(rows);
+        });
+    });
+
     app.post('/upload_image', upload.any(), (req, res) => {
         let imageData;
         let response;
@@ -406,7 +424,7 @@ module.exports = function (app) {
 
         if (imageData) {
             res.status(200).send({
-                img_url: imageData.destination + imageData.filename
+                img_url: imageData.filename
             });
         } else {
             res.status(500).send();
@@ -415,7 +433,18 @@ module.exports = function (app) {
 
     app.post('/add_equipment', (req, res) => {
         let data = req.body;
-        debugger;
+        data.id = uniqid();
+        let queryCode = `
+        INSERT
+            equipment (id, name, type, serial_number, purchase_time, state, studio_id, img_url)
+        VALUES
+            ('${data.id}', '${data.name}', '${data.type}', '${data.serial_number}', '${data.purchase_time}', '${data.state}', '${data.studio_id}', '${data.img_url}');
+        `;
+        dbQuery(queryCode).then(() => {
+            res.status(200).send(data);
+        }).catch((err) => {
+            res.status(500).send(err);
+        });
     });
 };
 
