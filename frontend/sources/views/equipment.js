@@ -65,7 +65,8 @@ export default class Equipment extends JetView {
                                     id: 'purchase_time',
                                     header: 'Purchase Time',
                                     fillspace: true,
-                                    editor: 'date'
+                                    editor: 'date',
+                                    format: webix.Date.dateToStr('%Y-%m-%d')
                                 },
                                 {
                                     id: 'state',
@@ -76,7 +77,7 @@ export default class Equipment extends JetView {
                                 }
                             ],
                             save: {
-                                update: '/update_equipment'
+                                update: URLS.update_equipment
                             }
                         },
                         {
@@ -111,8 +112,6 @@ export default class Equipment extends JetView {
         let imageUploader = this.imageUploader = $$('imageUpload');
         let list = this.list = $$('studioList');
         let datatable = this.datatable = $$('equipmentDatatable');
-        let infoBlock = this.infoBlock = $$('infoBlock');
-
 
         addEquipmentButton.attachEvent('onItemClick', () => {
             addEquipmentForm.clear();

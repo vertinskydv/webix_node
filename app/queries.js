@@ -458,7 +458,7 @@ module.exports = function (app) {
             id='${data.id}'`).then(() => {
             res.status(200).send();
         }).catch((err) => {
-            res.status(500).send();
+            res.status(500).send(err);
         });
     });
 
