@@ -102,12 +102,15 @@ export default class Equipment extends JetView {
         let addEquipmentModal = this.addEquipmentModal = $$('addEquipmentModal');
         let addEquipmentForm = this.addEquipmentForm = $$('addEquipmentForm');
         let saveEquipmentBtn = this.saveEquipmentBtn = $$('saveEquipmentBtn');
+        let imageUploader = this.imageUploader = $$('imageUpload');
         let list = this.list = $$('studioList');
         let datatable = this.datatable = $$('equipmentDatatable');
         let infoBlock = this.infoBlock = $$('infoBlock');
 
 
         addEquipmentButton.attachEvent('onItemClick', () => {
+            addEquipmentForm.clear();
+            imageUploader.files.data.clearAll();
             addEquipmentModal.show();
         });
 
@@ -146,7 +149,7 @@ export default class Equipment extends JetView {
                         datatable.add(data);
                     }
                 });
-                addEquipmentModal.close();
+                addEquipmentModal.hide();
             });
         });
     }
