@@ -2,6 +2,8 @@ import {JetView} from 'webix-jet';
 
 import {addEquipment, getStudioEquipments} from '../models/queries';
 
+import STATE from '../models/equipment/state';
+
 import URLS from '../models/urls';
 
 export default class Equipment extends JetView {
@@ -39,38 +41,42 @@ export default class Equipment extends JetView {
                             id: 'equipmentDatatable',
                             gravity: 0.5,
                             select: true,
+                            editable: true,
                             columns: [
                                 {
                                     id: 'name',
                                     header: 'Name',
-                                    fillspace: true
+                                    fillspace: true,
+                                    editor: 'text'
                                 },
                                 {
                                     id: 'type',
                                     header: 'Type',
-                                    fillspace: true
+                                    fillspace: true,
+                                    editor: 'text'
                                 },
                                 {
                                     id: 'serial_number',
                                     header: 'Serial Number',
-                                    fillspace: true
+                                    fillspace: true,
+                                    editor: 'text'
                                 },
                                 {
                                     id: 'purchase_time',
                                     header: 'Purchase Time',
-                                    fillspace: true
+                                    fillspace: true,
+                                    editor: 'date'
                                 },
                                 {
                                     id: 'state',
                                     header: 'State',
-                                    fillspace: true
+                                    fillspace: true,
+                                    editor: 'select',
+                                    options: STATE
                                 }
                             ],
-                            ready() {
-                                // webix.extend(this, webix.OverlayBox);
-                                // if (!this.count()) { // if no data is available
-                                //     this.showOverlay('<div>There is no data</div>');
-                                // }
+                            save: {
+                                update: '/update_equipment'
                             }
                         },
                         {
@@ -197,12 +203,7 @@ webix.ui({
                 name: 'state',
                 labelWidth: 150,
                 labelPosition: 'left',
-                options: [
-                    {id: 'used', value: 'Is Used'},
-                    {id: 'not_used', value: 'Not Used'},
-                    {id: 'broken', value: 'Broken'},
-                    {id: 'under_repair', value: 'Under Repair'}
-                ]
+                options: STATE
             },
             {
                 view: 'select',

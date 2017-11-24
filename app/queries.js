@@ -446,6 +446,22 @@ module.exports = function (app) {
             res.status(500).send(err);
         });
     });
+
+    app.post('/update_equipment', (req, res) => {
+        let data = req.body;
+        dbQuery(`
+        UPDATE 
+            equipment 
+        SET 
+            name = '${data.name}', type = '${data.type}', serial_number = '${data.serial_number}', purchase_time = '${data.purchase_time}', state = '${data.state}'
+        WHERE 
+            id='${data.id}'`).then(() => {
+            res.status(200).send();
+        }).catch((err) => {
+            res.status(500).send();
+        });
+    });
+
     // ============================================
     // end Equipment page queries
 };
