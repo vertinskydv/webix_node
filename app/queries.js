@@ -2,6 +2,7 @@ let mysql = require('mysql');
 let bodyParser = require('body-parser');
 let uniqid = require('uniqid');
 let multer = require('multer');
+let settings = require('./settings');
 
 let jsonParser = bodyParser.json();
 
@@ -15,12 +16,7 @@ let storage = multer.diskStorage({
 let upload = multer({ storage: storage });
 // let upload = multer({ dest: 'uploads/' });
 
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'wbx_db'
-});
+const db = mysql.createConnection(settings.dbSetting);
 db.connect();
 
 module.exports = function (app) {
@@ -29,7 +25,7 @@ module.exports = function (app) {
 
     // app.use(upload.all());
 
-    let dbQuery = function(queryCode) {
+    let dbQuery = function (queryCode) {
         return new Promise((resolve, reject) => {
             db.query(queryCode, (err, data) => {
                 if (err) reject(err);
@@ -41,12 +37,12 @@ module.exports = function (app) {
     // Locations page queries
     // ============================================
     app.post('/locations', (req, res) => {
-        db.query('SELECT * FROM studios ORDER BY name', (err, rows, fields) => {
+        db.query('SELECT * FROM studios ORDER BY name', (err, rows) => {
             if (err) throw err;
             rows = rows.map((rowObject) => {
                 let staffIdStr = rowObject.staff_id;
                 if (!staffIdStr) {
-                    rowObject.staff_count = 0
+                    rowObject.staff_count = 0;
                 } else {
                     let staffIdArr = JSON.parse(staffIdStr);
                     rowObject.staff_count = staffIdArr.length;
